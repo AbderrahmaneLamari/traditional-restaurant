@@ -9,6 +9,7 @@ import { Plus, Minus, X, ShoppingCart, Trash2, CreditCard } from "lucide-react"
 import { useCart } from "@/contexts/cart-context"
 import { GeometricPattern } from "@/components/arabic-patterns"
 import { ArabesqueLineDivider } from "@/components/arabesque-elements"
+import Link from "next/link"
 
 export function ShoppingCartSidebar() {
   const { state, removeItem, updateQuantity, clearCart, closeCart, getTotalItems, getTotalPrice } = useCart()
@@ -138,10 +139,12 @@ export function ShoppingCartSidebar() {
 
         {/* Action Buttons */}
         <div className="space-y-2">
-          <Button onClick={handleCheckout} className="w-full bg-amber-600 hover:bg-amber-700">
-            <CreditCard className="h-4 w-4 mr-2" />
-            Proceed to Checkout
-          </Button>
+          <Link href="/checkout" onClick={closeCart} className="w-full">
+            <Button className="w-full bg-amber-600 hover:bg-amber-700">
+              <CreditCard className="h-4 w-4 mr-2" />
+              Checkout
+            </Button>
+          </Link>
           <Button variant="outline" onClick={clearCart} className="w-full">
             <Trash2 className="h-4 w-4 mr-2" />
             Clear Cart

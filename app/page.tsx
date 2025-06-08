@@ -18,8 +18,6 @@ export default function Home() {
         <NavigationCards />
         <SectionDivider title="About Our Heritage" arabicTitle="عن تراثنا" />
         <About />
-        <SectionDivider title="Our Culinary Treasures" arabicTitle="كنوزنا الطهوية" />
-        <Menu />
         <SectionDivider title="Moments & Memories" arabicTitle="لحظات وذكريات" />
         <Gallery />
         <SectionDivider title="Connect With Us" arabicTitle="تواصل معنا" />

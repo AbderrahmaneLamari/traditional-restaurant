@@ -4,10 +4,11 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Plus, Minus, ShoppingCart } from "lucide-react"
+import { Plus, Minus, ShoppingCart, ArrowRight } from "lucide-react"
 import { GeometricPattern } from "@/components/arabic-patterns"
 import { ArabesqueLineDivider } from "@/components/arabesque-elements"
 import { useCart } from "@/contexts/cart-context"
+import Link from "next/link"
 
 interface MenuItem {
   id: number
@@ -248,11 +249,20 @@ export function Menu() {
 
         {/* View Cart Button */}
         {state.items.length > 0 && (
-          <div className="mt-12 text-center">
+          <div className="mt-12 text-center space-y-4">
             <Button onClick={openCart} size="lg" className="bg-amber-600 hover:bg-amber-700">
               <ShoppingCart className="h-5 w-5 mr-2" />
               View Cart ({state.items.reduce((total, item) => total + item.quantity, 0)} items)
             </Button>
+
+            <div>
+              <Link href="/checkout">
+                <Button variant="outline" size="lg">
+                  Proceed to Checkout
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
           </div>
         )}
       </div>

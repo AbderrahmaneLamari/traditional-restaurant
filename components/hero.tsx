@@ -10,7 +10,7 @@ export function Hero() {
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <Image
-          src="/images/restaurant-interior.jpg"
+          src="/images/restaurant-interior.png"
           alt="Traditional Algerian Restaurant Interior"
           fill
           className="object-cover"

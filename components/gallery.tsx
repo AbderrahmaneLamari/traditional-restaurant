@@ -3,29 +3,29 @@ import Image from "next/image"
 export function Gallery() {
   const images = [
     {
-      src: "/images/traditional-pottery.jpg",
+      src: "/images/traditional-pottery.png",
       alt: "Traditional Algerian pottery and tagines",
       title: "Authentic Cookware",
     },
     {
-      src: "/images/restaurant-interior.jpg",
+      src: "/images/restaurant-interior.png",
       alt: "Restaurant interior with traditional decor",
       title: "Warm Atmosphere",
     },
     {
-      src: "/images/restaurant-gate.jpg",
+      src: "/images/restaurant-gate.png",
       alt: "Restaurant entrance with ornate gates",
       title: "Welcome Entry",
     },
     {
-      src: "/images/menu-cover.jpg",
+      src: "/images/menu-cover.png",
       alt: "Traditional menu design",
       title: "Heritage Menu",
     },
   ]
 
   return (
-    <section id="gallery" className="py-20 bg-muted/30">
+    <section id="gallery" className="py-20 px-10 bg-muted/30">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-foreground">
