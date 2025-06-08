@@ -18,6 +18,7 @@ datasource db {
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
+  password  String
   name      String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -25,27 +26,53 @@ model User {
 
 model Message {
   id           String   @id @default(cuid())
+  firstname    String
+  lastname     String
+  location     String
   content      String
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   email_sender String
+  replies      Reply[]
+}
+
+model Reply {
+  id        String   @id @default(cuid())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  messageId String
+  message   Message  @relation(fields: [messageId], references: [id])
 }
 
 model Order {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        String     @id @default(cuid())
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
   email     String
+  table_num Int?
   status    String
+  items     MenuItem[] @relation("OrderItems")
 }
 
 model MenuItem {
-  id           String   @id @default(cuid())
+  id           String        @id @default(cuid())
   name         String
   price        Float
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  is_available Boolean  @default(true)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  is_available Boolean       @default(true)
+  orders       Order[]       @relation("OrderItems")
+  specials     ItemSpecial[]
+}
+
+model ItemSpecial {
+  id         String           @id @default(cuid())
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+  menuItemId String
+  menuItem   MenuItem         @relation(fields: [menuItemId], references: [id])
+  type       MenuItemSpecials
 }
 
 enum OrderStatus {
@@ -56,7 +83,7 @@ enum OrderStatus {
   CANCELLED
 }
 
-enum MenuItemSpecial {
+enum MenuItemSpecials {
   VEGAN
   POPULAR
   SPICY
