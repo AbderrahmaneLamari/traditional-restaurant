@@ -146,9 +146,9 @@ export function CheckoutForm() {
   }
 
   const subtotal = getTotalPrice()
-  const tax = subtotal * 0.085
+
   const deliveryFee = formData.orderType === "delivery" ? 3.99 : 0
-  const total = subtotal + tax + deliveryFee
+  const total = subtotal
 
   // Generate available time slots
   const generateTimeSlots = () => {
@@ -211,66 +211,6 @@ export function CheckoutForm() {
             {/* Order Form */}
             <div className="lg:col-span-2">
               <form onSubmit={handleSubmit} className="space-y-8">
-                {/* Customer Information */}
-                <Card className="relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-12 h-12 opacity-10">
-                    <GeometricPattern variant="corner" className="text-amber-600" />
-                  </div>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <User className="h-5 w-5 text-amber-600" />
-                      Customer Information
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid sm:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="firstName">First Name</Label>
-                        <Input
-                          id="firstName"
-                          name="firstName"
-                          value={formData.firstName}
-                          onChange={handleInputChange}
-                          required
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="lastName">Last Name</Label>
-                        <Input
-                          id="lastName"
-                          name="lastName"
-                          value={formData.lastName}
-                          onChange={handleInputChange}
-                          required
-                        />
-                      </div>
-                    </div>
-                    <div className="grid sm:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="email">Email</Label>
-                        <Input
-                          id="email"
-                          name="email"
-                          type="email"
-                          value={formData.email}
-                          onChange={handleInputChange}
-                          required
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="phone">Phone Number</Label>
-                        <Input
-                          id="phone"
-                          name="phone"
-                          type="tel"
-                          value={formData.phone}
-                          onChange={handleInputChange}
-                          required
-                        />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
 
                 {/* Order Type */}
                 <Card className="relative overflow-hidden">
@@ -290,7 +230,7 @@ export function CheckoutForm() {
                       className="grid sm:grid-cols-3 gap-4"
                     >
                       <div>
-                        <RadioGroupItem value="delivery" id="delivery" className="peer sr-only" />
+                        <RadioGroupItem value="delivery" id="delivery" className="peer sr-only" disabled />
                         <Label
                           htmlFor="delivery"
                           className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-amber-600 [&:has([data-state=checked])]:border-amber-600"
@@ -300,7 +240,7 @@ export function CheckoutForm() {
                         </Label>
                       </div>
                       <div>
-                        <RadioGroupItem value="pickup" id="pickup" className="peer sr-only" />
+                        <RadioGroupItem value="pickup" id="pickup" className="peer sr-only" disabled/>
                         <Label
                           htmlFor="pickup"
                           className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-amber-600 [&:has([data-state=checked])]:border-amber-600"
@@ -474,7 +414,7 @@ export function CheckoutForm() {
                       className="grid sm:grid-cols-3 gap-4"
                     >
                       <div>
-                        <RadioGroupItem value="credit-card" id="credit-card" className="peer sr-only" />
+                        <RadioGroupItem value="credit-card" id="credit-card" className="peer sr-only" disabled/>
                         <Label
                           htmlFor="credit-card"
                           className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-amber-600 [&:has([data-state=checked])]:border-amber-600"
@@ -506,30 +446,7 @@ export function CheckoutForm() {
                           <span className="text-sm font-medium">Cash</span>
                         </Label>
                       </div>
-                      <div>
-                        <RadioGroupItem value="paypal" id="paypal" className="peer sr-only" />
-                        <Label
-                          htmlFor="paypal"
-                          className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-amber-600 [&:has([data-state=checked])]:border-amber-600"
-                        >
-                          <svg
-                            className="mb-3 h-6 w-6"
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <path d="M17.5 7H20.5C21.3 7 22 7.7 22 8.5C22 9.3 21.3 10 20.5 10H17.5C16.7 10 16 9.3 16 8.5C16 7.7 16.7 7 17.5 7Z" />
-                            <path d="M2 8.5C2 7.7 2.7 7 3.5 7H14.5C15.3 7 16 7.7 16 8.5C16 9.3 15.3 10 14.5 10H3.5C2.7 10 2 9.3 2 8.5Z" />
-                            <path d="M2 15.5C2 14.7 2.7 14 3.5 14H6.5C7.3 14 8 14.7 8 15.5C8 16.3 7.3 17 6.5 17H3.5C2.7 17 2 16.3 2 15.5Z" />
-                            <path d="M9.5 14H20.5C21.3 14 22 14.7 22 15.5C22 16.3 21.3 17 20.5 17H9.5C8.7 17 8 16.3 8 15.5C8 14.7 8.7 14 9.5 14Z" />
-                          </svg>
-                          <span className="text-sm font-medium">PayPal</span>
-                        </Label>
-                      </div>
+                      
                     </RadioGroup>
 
                     {formData.paymentMethod === "credit-card" && (
@@ -578,35 +495,7 @@ export function CheckoutForm() {
                       />
                     </div>
 
-                    <div className="flex items-center space-x-2 pt-2">
-                      <Checkbox
-                        id="saveInfo"
-                        checked={formData.saveInfo}
-                        onCheckedChange={(checked) => handleCheckboxChange("saveInfo", checked as boolean)}
-                      />
-                      <Label htmlFor="saveInfo" className="text-sm">
-                        Save my information for future orders
-                      </Label>
-                    </div>
-
-                    <div className="flex items-center space-x-2 pt-2">
-                      <Checkbox
-                        id="termsAccepted"
-                        checked={formData.termsAccepted}
-                        onCheckedChange={(checked) => handleCheckboxChange("termsAccepted", checked as boolean)}
-                        required
-                      />
-                      <Label htmlFor="termsAccepted" className="text-sm">
-                        I agree to the{" "}
-                        <Link href="#" className="text-amber-600 hover:underline">
-                          Terms and Conditions
-                        </Link>{" "}
-                        and{" "}
-                        <Link href="#" className="text-amber-600 hover:underline">
-                          Privacy Policy
-                        </Link>
-                      </Label>
-                    </div>
+                    
                   </CardContent>
                 </Card>
 
@@ -682,16 +571,7 @@ export function CheckoutForm() {
                         <span>Subtotal</span>
                         <span>${subtotal.toFixed(2)}</span>
                       </div>
-                      <div className="flex justify-between text-sm">
-                        <span>Tax (8.5%)</span>
-                        <span>${tax.toFixed(2)}</span>
-                      </div>
-                      {formData.orderType === "delivery" && (
-                        <div className="flex justify-between text-sm">
-                          <span>Delivery Fee</span>
-                          <span>${deliveryFee.toFixed(2)}</span>
-                        </div>
-                      )}
+
                       <Separator />
                       <div className="flex justify-between font-semibold">
                         <span>Total</span>
@@ -700,21 +580,7 @@ export function CheckoutForm() {
                     </div>
 
                     {/* Estimated Time */}
-                    <div className="bg-muted/50 p-3 rounded-md mt-4">
-                      <div className="flex items-center gap-2 text-sm">
-                        <Clock className="h-4 w-4 text-amber-600" />
-                        <span className="font-medium">
-                          Estimated{" "}
-                          {formData.orderType === "delivery"
-                            ? "Delivery"
-                            : formData.orderType === "pickup"
-                              ? "Pickup"
-                              : "Preparation"}{" "}
-                          Time:
-                        </span>
-                        <span>30-45 minutes</span>
-                      </div>
-                    </div>
+                    
 
                     {/* Order Details Accordion */}
                     <Accordion type="single" collapsible className="mt-4">

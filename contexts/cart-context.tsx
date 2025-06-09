@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { createContext, useContext, useReducer, useEffect } from "react"
+import { createContext, useContext, useReducer, useEffect, useState } from "react"
 
 interface CartItem {
   id: number
@@ -27,7 +27,7 @@ type CartAction =
   | { type: "TOGGLE_CART" }
   | { type: "OPEN_CART" }
   | { type: "CLOSE_CART" }
-  | { type: "LOAD_CART"; payload: CartItem[] }
+  | { type: "LOAD_CART"; payload: { items: CartItem[]; isOpen?: boolean } }
 
 const CartContext = createContext<{
   state: CartState
@@ -101,12 +101,14 @@ function cartReducer(state: CartState, action: CartAction): CartState {
     case "LOAD_CART":
       return {
         ...state,
-        items: action.payload,
+        items: action.payload.items || [],
+        isOpen: action.payload.isOpen ?? false,
       }
     default:
       return state
   }
 }
+
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(cartReducer, {
@@ -114,23 +116,33 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     isOpen: false,
   })
 
-  // Load cart from localStorage on mount
+  const [cartInitialized, setCartInitialized] = useState(false)
+
+  // Load from localStorage
   useEffect(() => {
     const savedCart = localStorage.getItem("restaurant-cart")
     if (savedCart) {
       try {
-        const cartItems = JSON.parse(savedCart)
-        dispatch({ type: "LOAD_CART", payload: cartItems })
-      } catch (error) {
-        console.error("Error loading cart from localStorage:", error)
+        const parsed = JSON.parse(savedCart)
+        if (parsed?.items) {
+          dispatch({ type: "LOAD_CART", payload: parsed })
+        }
+      } catch (err) {
+        console.error("Failed to parse saved cart", err)
       }
     }
+    setCartInitialized(true)
   }, [])
 
-  // Save cart to localStorage whenever it changes
+  // Save to localStorage
   useEffect(() => {
-    localStorage.setItem("restaurant-cart", JSON.stringify(state.items))
-  }, [state.items])
+    if (cartInitialized) {
+      localStorage.setItem("restaurant-cart", JSON.stringify({
+        items: state.items,
+        isOpen: state.isOpen,
+      }))
+    }
+  }, [state.items, state.isOpen, cartInitialized])
 
   const addItem = (item: Omit<CartItem, "quantity">) => {
     dispatch({ type: "ADD_ITEM", payload: item })
@@ -184,7 +196,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         getTotalPrice,
       }}
     >
-      {children}
+      {children} 
     </CartContext.Provider>
   )
 }

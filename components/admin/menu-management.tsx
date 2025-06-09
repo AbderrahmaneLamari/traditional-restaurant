@@ -346,7 +346,7 @@ export function MenuManagement() {
                   <p className="text-2xl font-bold text-primary">${item.price}</p>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
                   <Button variant="outline" size="sm" onClick={() => toggleAvailability(item.id)}>
                     {item.available ? "Disable" : "Enable"}
                   </Button>

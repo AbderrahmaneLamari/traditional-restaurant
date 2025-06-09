@@ -14,12 +14,6 @@ import Link from "next/link"
 export function ShoppingCartSidebar() {
   const { state, removeItem, updateQuantity, clearCart, closeCart, getTotalItems, getTotalPrice } = useCart()
 
-  const handleCheckout = () => {
-    // In a real app, this would redirect to checkout page or open payment modal
-    alert("Redirecting to checkout...")
-    closeCart()
-  }
-
   if (state.items.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-full py-12">
@@ -126,14 +120,10 @@ export function ShoppingCartSidebar() {
             <span>Subtotal</span>
             <span>${getTotalPrice().toFixed(2)}</span>
           </div>
-          <div className="flex justify-between text-sm">
-            <span>Tax (8.5%)</span>
-            <span>${(getTotalPrice() * 0.085).toFixed(2)}</span>
-          </div>
           <Separator />
           <div className="flex justify-between font-semibold">
             <span>Total</span>
-            <span>${(getTotalPrice() * 1.085).toFixed(2)}</span>
+            <span>${(getTotalPrice()).toFixed(2)}</span>
           </div>
         </div>
 
@@ -151,9 +141,7 @@ export function ShoppingCartSidebar() {
           </Button>
         </div>
 
-        <p className="text-xs text-muted-foreground text-center">
-          Delivery available within 5 miles • Pickup available
-        </p>
+
       </div>
     </div>
   )

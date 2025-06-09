@@ -352,7 +352,7 @@ export function MessagesManagement() {
                   </div>
 
                   <div className="mb-3">
-                    <p className="text-sm text-muted-foreground flex items-center gap-4">
+                    <p className="text-sm text-muted-foreground flex items-center gap-4 grid grid-cols-1 grid-rows-3  md:grid-cols-2 md:grid-rows-2 ">
                       <span className="flex items-center gap-1">
                         <Mail className="h-3 w-3" />
                         {message.email}

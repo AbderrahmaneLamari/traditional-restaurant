@@ -77,7 +77,7 @@ export function AdminDashboard() {
                   Back to Site
                 </Button>
               </Link>
-              <h1 className="text-2xl font-bold text-primary">
+              <h1 className="text-2xl font-bold text-primary text-sm lg:text-lg xl:text-xl">
                 <span className="text-amber-600">Admin</span> Dashboard
               </h1>
             </div>
@@ -98,29 +98,27 @@ export function AdminDashboard() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           {/* Navigation Tabs */}
-          <TabsList className="grid w-full grid-cols-6">
-            <TabsTrigger value="overview" className="flex items-center gap-2">
-              <LayoutDashboard className="h-4 w-4" />
+          <TabsList className="grid w-full grid-cols-4 grid-rows-2 gap-2 h-12 sm:h-12 md:h-15 sm:grid-cols-5 sm:grid-rows-1 sm:gap-2">
+
+            <TabsTrigger value="overview" className="flex items-center gap-2 max-sm:text-xs max-md:text-sm max-lg:text-md">
+              <LayoutDashboard className="max-sm:h-2 max-sm:w-2 max-md:h-3 max-md:w-3 max-lg:h-4 max-lg:w-4" />
               Overview
-            </TabsTrigger>
-            <TabsTrigger value="menu" className="flex items-center gap-2">
-              <Menu className="h-4 w-4" />
+            </TabsTrigger>  
+            <TabsTrigger value="menu" className="flex items-center gap-2 max-sm:text-xs max-md:text-sm max-lg:text-md">
+              <Menu className="max-sm:h-2 max-sm:w-2 max-md:h-3 max-md:w-3 max-lg:h-4 max-lg:w-4" />
               Menu
             </TabsTrigger>
-            <TabsTrigger value="orders" className="flex items-center gap-2">
-              <ShoppingCart className="h-4 w-4" />
+            <TabsTrigger value="orders" className="flex items-center gap-2 max-sm:text-xs max-md:text-sm max-lg:text-md">
+              <ShoppingCart className="max-sm:h-2 max-sm:w-2 max-md:h-3 max-md:w-3 max-lg:h-4 max-lg:w-4" />
               Orders
             </TabsTrigger>
-            <TabsTrigger value="users" className="flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              Users
-            </TabsTrigger>
-            <TabsTrigger value="messages" className="flex items-center gap-2">
-              <MessageSquare className="h-4 w-4" />
+            
+            <TabsTrigger value="messages" className="flex items-center gap-2 max-sm:text-xs max-md:text-sm max-lg:text-md">
+              <MessageSquare className="max-sm:h-2 max-sm:w-2 max-md:h-3 max-md:w-3 max-lg:h-4 max-lg:w-4" />
               Messages
             </TabsTrigger>
-            <TabsTrigger value="analytics" className="flex items-center gap-2">
-              <BarChart3 className="h-4 w-4" />
+            <TabsTrigger value="analytics" className="flex items-center gap-2 max-sm:text-xs max-md:text-sm max-lg:text-md">
+              <BarChart3 className="max-sm:h-2 max-sm:w-2 max-md:h-3 max-md:w-3 max-lg:h-4 max-lg:w-4" />
               Analytics
             </TabsTrigger>
           </TabsList>
@@ -188,11 +186,6 @@ export function AdminDashboard() {
           {/* Orders Tab */}
           <TabsContent value="orders">
             <OrderManagement />
-          </TabsContent>
-
-          {/* Users Tab */}
-          <TabsContent value="users">
-            <UserManagement />
           </TabsContent>
 
           {/* Messages Tab */}
