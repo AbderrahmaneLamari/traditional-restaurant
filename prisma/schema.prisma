@@ -34,6 +34,7 @@ model Message {
   updatedAt    DateTime @updatedAt
   email_sender String
   replies      Reply[]
+  archived     Boolean  @default(false)
 }
 
 model Reply {
