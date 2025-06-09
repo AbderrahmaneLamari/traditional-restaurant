@@ -1,5 +1,4 @@
 "use client"
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   BarChart,
@@ -15,7 +14,8 @@ import {
   Pie,
   Cell,
 } from "recharts"
-import { TrendingUp, TrendingDown, DollarSign, ShoppingCart, Star } from "lucide-react"
+import { DollarSign, ShoppingCart } from "lucide-react"
+import { useEffect, useState } from "react"
 
 const revenueData = [
   { month: "Jan", revenue: 12400, orders: 89 },
@@ -26,14 +26,6 @@ const revenueData = [
   { month: "Jun", revenue: 18200, orders: 142 },
 ]
 
-const popularItems = [
-  { name: "Couscous Royale", orders: 45, revenue: 854.55 },
-  { name: "Tagine Djaj", orders: 38, revenue: 645.62 },
-  { name: "Mechoui", orders: 32, revenue: 735.68 },
-  { name: "Chorba", orders: 28, revenue: 251.72 },
-  { name: "Baklava", orders: 25, revenue: 174.75 },
-]
-
 const orderTypes = [
   { name: "Delivery", value: 65, color: "#f59e0b" },
   { name: "Pickup", value: 35, color: "#10b981" },
@@ -42,9 +34,55 @@ const orderTypes = [
 const COLORS = ["#f59e0b", "#10b981"]
 
 export function Analytics() {
-  const totalRevenue = revenueData.reduce((sum, item) => sum + item.revenue, 0)
-  const totalOrders = revenueData.reduce((sum, item) => sum + item.orders, 0)
-  const avgOrderValue = totalRevenue / totalOrders
+
+  const [dashboard, setDashboard] = useState({
+    totalRevenue: 0,
+    orderCount: 0,
+    AOV: 0,
+  })
+  const [topItems, setTopItems] = useState([])
+  const [popularItems, setPopularItems] = useState([])
+  const [orderTypes, setOrderTypes] = useState([])
+
+
+
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      try {
+
+        const res = await fetch("/api/v1/analytics/dashboard", {
+          cache: "no-store",
+        })
+
+        const topItems = await fetch("/api/v1/analytics/top-items", {
+          cache: "no-store",
+        })
+
+        if (!topItems.ok) {
+          const err = await topItems.json()
+          throw new Error(err.error || "Failed to fetch top items")
+        }
+
+        if (!res.ok) {
+          const err = await res.json()
+          throw new Error(err.error || "Failed to fetch analytics")
+        }
+
+        const data = await res.json()
+
+        setDashboard({
+          totalRevenue: data.totalRevenue,
+          orderCount: data.orderCount,
+          AOV: data.AOV,
+        })
+        setTopItems(await topItems.json())
+      } catch (err) {
+        console.error("Analytics fetch error:", err)
+      }
+    }
+
+    fetchAnalytics()
+  }, [])
 
   return (
     <div className="space-y-6">
@@ -62,14 +100,7 @@ export function Analytics() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${totalRevenue.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">
-              <span className="text-green-600 flex items-center">
-                <TrendingUp className="h-3 w-3 mr-1" />
-                +12.5%
-              </span>
-              from last period
-            </p>
+            <div className="text-2xl font-bold">DZD{dashboard.totalRevenue}</div>
           </CardContent>
         </Card>
 
@@ -79,14 +110,7 @@ export function Analytics() {
             <ShoppingCart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalOrders}</div>
-            <p className="text-xs text-muted-foreground">
-              <span className="text-green-600 flex items-center">
-                <TrendingUp className="h-3 w-3 mr-1" />
-                +8.2%
-              </span>
-              from last period
-            </p>
+            <div className="text-2xl font-bold">{dashboard.orderCount}</div>
           </CardContent>
         </Card>
 
@@ -96,31 +120,8 @@ export function Analytics() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${avgOrderValue.toFixed(2)}</div>
-            <p className="text-xs text-muted-foreground">
-              <span className="text-red-600 flex items-center">
-                <TrendingDown className="h-3 w-3 mr-1" />
-                -2.1%
-              </span>
-              from last period
-            </p>
-          </CardContent>
-        </Card>
+            <div className="text-2xl font-bold">DZD {dashboard.AOV}</div>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Customer Rating</CardTitle>
-            <Star className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">4.8</div>
-            <p className="text-xs text-muted-foreground">
-              <span className="text-green-600 flex items-center">
-                <TrendingUp className="h-3 w-3 mr-1" />
-                +0.2
-              </span>
-              from last period
-            </p>
           </CardContent>
         </Card>
       </div>
@@ -138,7 +139,7 @@ export function Analytics() {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="month" />
                 <YAxis />
-                <Tooltip formatter={(value) => [`$${value}`, "Revenue"]} />
+                <Tooltip formatter={(value) => [`DZD${value}`, "Revenue"]} />
                 <Line type="monotone" dataKey="revenue" stroke="#f59e0b" strokeWidth={2} dot={{ fill: "#f59e0b" }} />
               </LineChart>
             </ResponsiveContainer>
@@ -181,7 +182,7 @@ export function Analytics() {
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={popularItems}>
+            <BarChart data={topItems as { name: string, orders: number }[]}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" />
               <YAxis />
@@ -199,7 +200,7 @@ export function Analytics() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {popularItems.map((item, index) => (
+            {topItems.map((item: { name: string, count: number, revenue: number }, index) => (
               <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
                 <div className="flex items-center gap-4">
                   <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center">
@@ -207,11 +208,11 @@ export function Analytics() {
                   </div>
                   <div>
                     <h3 className="font-semibold">{item.name}</h3>
-                    <p className="text-sm text-muted-foreground">{item.orders} orders</p>
+                    <p className="text-sm text-muted-foreground">{item.count} orders</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-semibold">${item.revenue.toFixed(2)}</p>
+                  <p className="font-semibold">DZD{item.revenue.toFixed(2)}</p>
                   <p className="text-sm text-muted-foreground">Revenue</p>
                 </div>
               </div>

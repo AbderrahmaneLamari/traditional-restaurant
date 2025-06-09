@@ -43,8 +43,6 @@ export async function GET() {
                 revenueRatio: result.revenueGrowth,
                 ordersToday: result.currentCount,
                 ordersRatio: result.countGrowth,
-                aovThisMonth: result.currentAOV,
-                aovRatio: result.aovGrowth,
                 growth: result.compositeGrowth,
                 numberMenuItems
             }

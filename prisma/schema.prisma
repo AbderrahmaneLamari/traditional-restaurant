@@ -25,16 +25,22 @@ model User {
 }
 
 model Message {
-  id           String   @id @default(cuid())
-  firstname    String
+  id           Int      @id @default(autoincrement())
+  fistname         String
   lastname     String
   location     String
   content      String
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   email_sender String
-  replies      Reply[]
+  phone        String? // ✅ Add if needed
+  subject      String? // ✅ Add if needed
+  category     String? // ✅ "general" | "complaint" etc.
+  priority     String? // ✅ "low" | "medium" | "high"
+  starred      Boolean  @default(false) // ✅ Add this field
+  status       String? // ✅ Track status explicitly
   archived     Boolean  @default(false)
+  replies      Reply[]
 }
 
 model Reply {
@@ -42,7 +48,7 @@ model Reply {
   content   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  messageId String
+  messageId Int
   message   Message  @relation(fields: [messageId], references: [id])
 }
 
