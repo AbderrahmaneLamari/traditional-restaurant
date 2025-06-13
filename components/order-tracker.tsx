@@ -3,12 +3,14 @@
 import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Search, CheckCircle2, Clock, ChefHat, Truck, MapPin, Phone } from "lucide-react"
 import { GeometricPattern } from "@/components/arabic-patterns"
 import { ArabesqueLineDivider } from "@/components/arabesque-elements"
 import Link from "next/link"
+import { Order } from "@/lib/generated/prisma"
+
+
 
 interface OrderStatus {
   id: string
@@ -75,40 +77,27 @@ const mockOrders: Record<string, OrderStatus> = {
   },
 }
 
-export function OrderTracker() {
-  const [orderNumber, setOrderNumber] = useState("")
+interface menuItems {
+  name: string
+  price: number
+  quantity: number
+}
+
+export function OrderTracker({ orderProp, totalSum, menuItems }: { orderProp: Order, totalSum: number, menuItems: menuItems[] }) {
+
   const [order, setOrder] = useState<OrderStatus | null>(null)
-  const [error, setError] = useState("")
-
-  const handleSearch = () => {
-    setError("")
-
-    if (!orderNumber.trim()) {
-      setError("Please enter an order number")
-      return
-    }
-
-    const foundOrder = mockOrders[orderNumber.trim()]
-
-    if (foundOrder) {
-      setOrder(foundOrder)
-    } else {
-      setError("Order not found. Please check your order number and try again.")
-      setOrder(null)
-    }
-  }
 
   const getStatusStep = (status: string) => {
     switch (status) {
-      case "pending":
+      case "PENDING":
         return 1
-      case "preparing":
+      case "PREPARING":
         return 2
-      case "ready":
+      case "READY":
         return 3
-      case "out-for-delivery":
+      case "OUT-FOR-DELIVERY":
         return 4
-      case "delivered":
+      case "DELIVERED":
         return 5
       default:
         return 1
@@ -117,15 +106,15 @@ export function OrderTracker() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "pending":
+      case "PENDING":
         return "bg-yellow-100 text-yellow-800"
-      case "preparing":
+      case "PREPARING":
         return "bg-blue-100 text-blue-800"
-      case "ready":
+      case "READY":
         return "bg-green-100 text-green-800"
-      case "out-for-delivery":
+      case "OUT-FOR-DELIVERY":
         return "bg-purple-100 text-purple-800"
-      case "delivered":
+      case "DELIVERED":
         return "bg-gray-100 text-gray-800"
       default:
         return "bg-gray-100 text-gray-800"
@@ -134,15 +123,15 @@ export function OrderTracker() {
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case "pending":
+      case "PENDING":
         return "Order Received"
-      case "preparing":
+      case "PREPARING":
         return "Preparing Your Order"
-      case "ready":
+      case "READY":
         return "Ready for Pickup/Delivery"
-      case "out-for-delivery":
+      case "OUT-FOR-DELIVERY":
         return "Out for Delivery"
-      case "delivered":
+      case "DELIVERED":
         return "Delivered"
       default:
         return "Unknown Status"
@@ -193,37 +182,8 @@ export function OrderTracker() {
           </Link>
         </div>
 
-        {/* Order Search */}
-        <Card className="max-w-2xl mx-auto mb-12">
-          <CardHeader>
-            <CardTitle>Track Your Order</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Enter your order number (e.g., ORD-1234)"
-                  value={orderNumber}
-                  onChange={(e) => setOrderNumber(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-              <Button onClick={handleSearch} className="bg-amber-600 hover:bg-amber-700">
-                Track Order
-              </Button>
-            </div>
-
-            {error && <p className="text-red-500 mt-4 text-center">{error}</p>}
-
-            <div className="mt-4 text-center text-sm text-muted-foreground">
-              <p>For testing, try these order numbers: ORD-1234, ORD-5678, ORD-9012</p>
-            </div>
-          </CardContent>
-        </Card>
-
         {/* Order Details */}
-        {order && (
+        {(
           <Card className="max-w-4xl mx-auto relative overflow-hidden">
             {/* Background pattern */}
             <div className="absolute inset-0 opacity-5">
@@ -233,10 +193,10 @@ export function OrderTracker() {
             <CardHeader className="relative z-10">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                  <CardTitle className="text-2xl">Order #{order.id}</CardTitle>
-                  <p className="text-muted-foreground">Placed on {order.orderTime}</p>
+                  <CardTitle className="text-2xl">Order #{orderProp.id}</CardTitle>
+                  {/* <p className="text-muted-foreground">Placed on {orderProp.createdAt.toISOString()}</p> */}
                 </div>
-                <Badge className={getStatusColor(order.status)}>{getStatusText(order.status)}</Badge>
+                <Badge className={getStatusColor(orderProp.status)}>{getStatusText(orderProp.status)}</Badge>
               </div>
             </CardHeader>
 
@@ -249,26 +209,24 @@ export function OrderTracker() {
                   <div className="absolute top-1/2 left-0 right-0 h-1 bg-gray-200 transform -translate-y-1/2"></div>
                   <div
                     className="absolute top-1/2 left-0 h-1 bg-amber-600 transform -translate-y-1/2"
-                    style={{ width: `${(getStatusStep(order.status) / 5) * 100}%` }}
+                    style={{ width: `${(getStatusStep(orderProp.status) / 5) * 100}%` }}
                   ></div>
 
                   {/* Status steps */}
                   <div className="relative flex justify-between">
-                    {["pending", "preparing", "ready", "out-for-delivery", "delivered"].map((status, index) => {
-                      const isActive = getStatusStep(order.status) >= index + 1
+                    {["PENDING", "PREPARING", "READY", "OUT-FOR-DELIVERY", "DELIVERED"].map((status, index) => {
+                      const isActive = getStatusStep(orderProp.status) >= index + 1
                       return (
                         <div key={status} className="flex flex-col items-center">
                           <div
-                            className={`w-8 h-8 rounded-full flex items-center justify-center z-10 ${
-                              isActive ? "bg-amber-600" : "bg-gray-200"
-                            }`}
+                            className={`w-8 h-8 rounded-full flex items-center justify-center z-10 ${isActive ? "bg-amber-600" : "bg-gray-200"
+                              }`}
                           >
                             {getStatusIcon(status, isActive)}
                           </div>
                           <span
-                            className={`text-xs mt-2 text-center max-w-[80px] ${
-                              isActive ? "text-foreground font-medium" : "text-muted-foreground"
-                            }`}
+                            className={`text-xs mt-5 text-center max-w-[80px] ${isActive ? "text-foreground font-medium" : "text-muted-foreground"
+                              }`}
                           >
                             {getStatusText(status)}
                           </span>
@@ -279,28 +237,18 @@ export function OrderTracker() {
                 </div>
               </div>
 
-              {/* Estimated Time */}
-              {order.estimatedDeliveryTime && (
-                <div className="mb-6 p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
-                  <h3 className="font-semibold flex items-center gap-2">
-                    <Clock className="h-5 w-5 text-amber-600" />
-                    {order.type === "delivery" ? "Estimated Delivery" : "Ready for Pickup"}
-                  </h3>
-                  <p className="text-lg font-medium">{order.estimatedDeliveryTime}</p>
-                </div>
-              )}
 
               {/* Customer Details */}
               <div className="grid md:grid-cols-2 gap-6 mb-6">
                 <div>
-                  <h3 className="font-semibold mb-2">Customer Details</h3>
-                  <p>{order.customerName}</p>
+                  <h3 className="font-semibold mb-2">Details</h3>
+                  <p>Table No.{orderProp.table_num}</p>
                   <p className="flex items-center gap-1 text-muted-foreground">
-                    <Phone className="h-4 w-4" /> {order.customerPhone}
+                    <Phone className="h-4 w-4" /> {orderProp.phone}
                   </p>
                 </div>
 
-                {order.type === "delivery" && order.address && (
+                {/* {orderProp.type === "delivery" && order.address && (
                   <div>
                     <h3 className="font-semibold mb-2">Delivery Address</h3>
                     <p className="flex items-start gap-1">
@@ -308,27 +256,27 @@ export function OrderTracker() {
                       <span>{order.address}</span>
                     </p>
                   </div>
-                )}
+                )} */}
               </div>
 
               {/* Order Items */}
               <div>
                 <h3 className="font-semibold mb-2">Order Items</h3>
                 <div className="space-y-2 mb-4">
-                  {order.items.map((item, index) => (
+                  {menuItems.map((item, index) => (
                     <div key={index} className="flex justify-between py-2 border-b">
                       <div>
                         <span className="font-medium">{item.name}</span>
                         <span className="text-muted-foreground"> × {item.quantity}</span>
                       </div>
-                      <span>${(item.price * item.quantity).toFixed(2)}</span>
+                      <span>DZD{(item.price * item.quantity).toFixed(2)}</span>
                     </div>
                   ))}
                 </div>
 
                 <div className="flex justify-between font-bold text-lg">
                   <span>Total</span>
-                  <span>${order.total.toFixed(2)}</span>
+                  <span>DZD{totalSum}</span>
                 </div>
               </div>
 

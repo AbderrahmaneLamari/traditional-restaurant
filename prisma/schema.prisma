@@ -26,7 +26,7 @@ model User {
 
 model Message {
   id           Int      @id @default(autoincrement())
-  fistname         String
+  firstname    String
   lastname     String
   location     String
   content      String
@@ -53,24 +53,41 @@ model Reply {
 }
 
 model Order {
-  id        String     @id @default(cuid())
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  email     String
-  table_num Int?
-  status    String
-  items     MenuItem[] @relation("OrderItems")
+  id         String     @id @default(cuid())
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  email      String
+  phone      String
+  table_num  Int?
+  status     OrderStatus @default(PENDING)
+
+
+  OrderItem OrderItem[]
 }
 
+model OrderItem{
+  id         String   @id @default(cuid())
+  orderId    String
+  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItemId String
+  menuItem   MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+  quantity   Int      @default(1)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
 model MenuItem {
-  id           String        @id @default(cuid())
-  name         String
-  price        Float
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  is_available Boolean       @default(true)
-  orders       Order[]       @relation("OrderItems")
-  specials     ItemSpecial[]
+  id          String        @id @default(cuid())
+  name        String
+  arabicName  String?
+  description String?
+  category    String
+  price       Float
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  available   Boolean       @default(true)
+  specials    ItemSpecial[]
+
+  OrderItem OrderItem[]
 }
 
 model ItemSpecial {
@@ -78,7 +95,7 @@ model ItemSpecial {
   createdAt  DateTime         @default(now())
   updatedAt  DateTime         @updatedAt
   menuItemId String
-  menuItem   MenuItem         @relation(fields: [menuItemId], references: [id])
+  menuItem   MenuItem         @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
   type       MenuItemSpecials
 }
 

@@ -11,7 +11,7 @@ import { ArabesqueLineDivider } from "@/components/arabesque-elements"
 import { useCart } from "@/contexts/cart-context"
 
 interface MenuItem {
-  id: number
+  id: string
   name: string
   arabicName: string
   description: string
@@ -23,96 +23,96 @@ interface MenuItem {
   image?: string
 }
 
-const menuItems: MenuItem[] = [
-  {
-    id: 1,
-    name: "Couscous Royale",
-    arabicName: "كسكس ملكي",
-    description: "Traditional couscous with lamb, chicken, and vegetables served with aromatic broth",
-    price: 18.99,
-    category: "mains",
-    popular: true,
-  },
-  {
-    id: 2,
-    name: "Tagine Djaj",
-    arabicName: "طاجين دجاج",
-    description: "Slow-cooked chicken tagine with olives, preserved lemons, and traditional spices",
-    price: 16.99,
-    category: "mains",
-    popular: true,
-  },
-  {
-    id: 3,
-    name: "Chorba Frik",
-    arabicName: "شوربة فريك",
-    description: "Traditional Algerian soup with lamb, vegetables, and cracked wheat",
-    price: 8.99,
-    category: "starters",
-  },
-  {
-    id: 4,
-    name: "Mechoui",
-    arabicName: "مشوي",
-    description: "Slow-roasted lamb shoulder with traditional Ras el Hanout spice blend",
-    price: 22.99,
-    category: "mains",
-    spicy: true,
-  },
-  {
-    id: 5,
-    name: "Brik à l'Oeuf",
-    arabicName: "بريك بالبيض",
-    description: "Crispy pastry filled with egg, tuna, capers, and fresh herbs",
-    price: 7.99,
-    category: "starters",
-  },
-  {
-    id: 6,
-    name: "Makroudh",
-    arabicName: "مقروض",
-    description: "Traditional semolina pastry filled with dates and honey",
-    price: 5.99,
-    category: "desserts",
-    vegetarian: true,
-  },
-  {
-    id: 7,
-    name: "Baklava",
-    arabicName: "بقلاوة",
-    description: "Layers of phyllo pastry with pistachios, almonds, and honey syrup",
-    price: 6.99,
-    category: "desserts",
-    vegetarian: true,
-  },
-  {
-    id: 8,
-    name: "Atay Bil Na'na",
-    arabicName: "أتاي بالنعناع",
-    description: "Traditional North African mint tea served in authentic glasses",
-    price: 3.99,
-    category: "beverages",
-    vegetarian: true,
-  },
-  {
-    id: 9,
-    name: "Harira",
-    arabicName: "حريرة",
-    description: "Rich tomato-based soup with lentils, chickpeas, and fresh herbs",
-    price: 7.99,
-    category: "starters",
-    vegetarian: true,
-  },
-  {
-    id: 10,
-    name: "Kefta Tagine",
-    arabicName: "طاجين كفتة",
-    description: "Spiced meatballs in tomato sauce with eggs and fresh herbs",
-    price: 15.99,
-    category: "mains",
-    spicy: true,
-  },
-]
+// const menuItems: MenuItem[] = [
+//   {
+//     id: '1',
+//     name: "Couscous Royale",
+//     arabicName: "كسكس ملكي",
+//     description: "Traditional couscous with lamb, chicken, and vegetables served with aromatic broth",
+//     price: 18.99,
+//     category: "mains",
+//     popular: true,
+//   },
+//   {
+//     id: '2',
+//     name: "Tagine Djaj",
+//     arabicName: "طاجين دجاج",
+//     description: "Slow-cooked chicken tagine with olives, preserved lemons, and traditional spices",
+//     price: 16.99,
+//     category: "mains",
+//     popular: true,
+//   },
+//   {
+//     id: '3',
+//     name: "Chorba Frik",
+//     arabicName: "شوربة فريك",
+//     description: "Traditional Algerian soup with lamb, vegetables, and cracked wheat",
+//     price: 8.99,
+//     category: "starters",
+//   },
+//   {
+//     id: '4',
+//     name: "Mechoui",
+//     arabicName: "مشوي",
+//     description: "Slow-roasted lamb shoulder with traditional Ras el Hanout spice blend",
+//     price: 22.99,
+//     category: "mains",
+//     spicy: true,
+//   },
+//   {
+//     id: '5',
+//     name: "Brik à l'Oeuf",
+//     arabicName: "بريك بالبيض",
+//     description: "Crispy pastry filled with egg, tuna, capers, and fresh herbs",
+//     price: 7.99,
+//     category: "starters",
+//   },
+//   {
+//     id: '6',
+//     name: "Makroudh",
+//     arabicName: "مقروض",
+//     description: "Traditional semolina pastry filled with dates and honey",
+//     price: 5.99,
+//     category: "desserts",
+//     vegetarian: true,
+//   },
+//   {
+//     id: '7',
+//     name: "Baklava",
+//     arabicName: "بقلاوة",
+//     description: "Layers of phyllo pastry with pistachios, almonds, and honey syrup",
+//     price: 6.99,
+//     category: "desserts",
+//     vegetarian: true,
+//   },
+//   {
+//     id: '8',
+//     name: "Atay Bil Na'na",
+//     arabicName: "أتاي بالنعناع",
+//     description: "Traditional North African mint tea served in authentic glasses",
+//     price: 3.99,
+//     category: "beverages",
+//     vegetarian: true,
+//   },
+//   {
+//     id: '9',
+//     name: "Harira",
+//     arabicName: "حريرة",
+//     description: "Rich tomato-based soup with lentils, chickpeas, and fresh herbs",
+//     price: 7.99,
+//     category: "starters",
+//     vegetarian: true,
+//   },
+//   {
+//     id: '10',
+//     name: "Kefta Tagine",
+//     arabicName: "طاجين كفتة",
+//     description: "Spiced meatballs in tomato sauce with eggs and fresh herbs",
+//     price: 15.99,
+//     category: "mains",
+//     spicy: true,
+//   },
+// ]
 
 const categories = [
   { id: "all", name: "All Items", arabicName: "جميع الأطباق" },
@@ -122,14 +122,14 @@ const categories = [
   { id: "beverages", name: "Beverages", arabicName: "المشروبات" },
 ]
 
-export function OnlineMenu() {
+export function OnlineMenu({ menuItems }: { menuItems: MenuItem[] }) {
   const [selectedCategory, setSelectedCategory] = useState("all")
   const { state, addItem, updateQuantity, openCart } = useCart()
 
   const filteredItems =
     selectedCategory === "all" ? menuItems : menuItems.filter((item) => item.category === selectedCategory)
 
-  const getItemQuantity = (itemId: number) => {
+  const getItemQuantity = (itemId: string) => {
     const cartItem = state.items.find((item) => item.id === itemId)
     return cartItem ? cartItem.quantity : 0
   }
@@ -146,12 +146,12 @@ export function OnlineMenu() {
     })
   }
 
-  const handleIncrement = (itemId: number) => {
+  const handleIncrement = (itemId: string) => {
     const currentQuantity = getItemQuantity(itemId)
     updateQuantity(itemId, currentQuantity + 1)
   }
 
-  const handleDecrement = (itemId: number) => {
+  const handleDecrement = (itemId: string) => {
     const currentQuantity = getItemQuantity(itemId)
     if (currentQuantity > 0) {
       updateQuantity(itemId, currentQuantity - 1)

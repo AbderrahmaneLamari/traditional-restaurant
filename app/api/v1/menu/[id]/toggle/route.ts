@@ -7,7 +7,7 @@ export async function PUT(_: NextRequest, { params }: { params: { id: string } }
 
     const updated = await prisma.menuItem.update({
         where: { id: params.id },
-        data: { is_available: !item.is_available }
+        data: { available: !item.available }
     })
 
     return NextResponse.json({ message: 'Toggled', updated })

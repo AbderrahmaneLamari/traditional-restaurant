@@ -15,7 +15,8 @@ import {
   Cell,
 } from "recharts"
 import { DollarSign, ShoppingCart } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useState } from "react"
+import { AnalyticsProps } from "./AnalyticsInterface"
 
 const revenueData = [
   { month: "Jan", revenue: 12400, orders: 89 },
@@ -33,56 +34,14 @@ const orderTypes = [
 
 const COLORS = ["#f59e0b", "#10b981"]
 
-export function Analytics() {
+export function Analytics({ topMenuItems, overviewData, revenueTrend }: AnalyticsProps) {
 
-  const [dashboard, setDashboard] = useState({
-    totalRevenue: 0,
-    orderCount: 0,
-    AOV: 0,
-  })
-  const [topItems, setTopItems] = useState([])
-  const [popularItems, setPopularItems] = useState([])
-  const [orderTypes, setOrderTypes] = useState([])
+  const [dashboard] = useState(overviewData)
+  const [topItems] = useState<{ name: string, count: number, revenue: number }[]>(topMenuItems)
+
+  const [orderTypes] = useState([])
 
 
-
-  useEffect(() => {
-    const fetchAnalytics = async () => {
-      try {
-
-        const res = await fetch("/api/v1/analytics/dashboard", {
-          cache: "no-store",
-        })
-
-        const topItems = await fetch("/api/v1/analytics/top-items", {
-          cache: "no-store",
-        })
-
-        if (!topItems.ok) {
-          const err = await topItems.json()
-          throw new Error(err.error || "Failed to fetch top items")
-        }
-
-        if (!res.ok) {
-          const err = await res.json()
-          throw new Error(err.error || "Failed to fetch analytics")
-        }
-
-        const data = await res.json()
-
-        setDashboard({
-          totalRevenue: data.totalRevenue,
-          orderCount: data.orderCount,
-          AOV: data.AOV,
-        })
-        setTopItems(await topItems.json())
-      } catch (err) {
-        console.error("Analytics fetch error:", err)
-      }
-    }
-
-    fetchAnalytics()
-  }, [])
 
   return (
     <div className="space-y-6">
@@ -135,7 +94,7 @@ export function Analytics() {
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={revenueData}>
+              <LineChart data={revenueTrend}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="month" />
                 <YAxis />
@@ -182,12 +141,12 @@ export function Analytics() {
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={topItems as { name: string, orders: number }[]}>
+            <BarChart data={topItems as { name: string, count: number }[]}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" />
               <YAxis />
               <Tooltip />
-              <Bar dataKey="orders" fill="#f59e0b" />
+              <Bar dataKey="count" fill="#f59e0b" />
             </BarChart>
           </ResponsiveContainer>
         </CardContent>

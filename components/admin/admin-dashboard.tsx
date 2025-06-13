@@ -44,7 +44,7 @@ export function AdminDashboard() {
   useEffect(() => {
     async function fetchSummary() {
       try {
-        const response = await fetch('/api/v1/analytics/summary')
+        const response = await fetch('/api/v1/analytics/summary', {cache: 'no-store'})
         if (!response.ok) {
           throw new Error('Failed to fetch summary')
         }

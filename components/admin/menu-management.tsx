@@ -14,8 +14,8 @@ import { Plus, Edit, Trash2, Search } from "lucide-react"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 
-interface MenuItem {
-  id: number
+export interface MenuItem {
+  id: string
   name: string
   arabicName: string
   description: string
@@ -27,9 +27,28 @@ interface MenuItem {
   available: boolean
 }
 
-const initialMenuItems: MenuItem[] = [
+interface MenuManagementProps {
+  initialMenuItems?: MenuItem[]
+  onMenuItemsChange?: (items: MenuItem[]) => void
+}
+
+interface MenuItemPayload {
+  id: string
+  name: string
+  arabicName: string
+  description: string
+  price: string
+  category: string
+  spicy: boolean
+  vegan: boolean
+  popular: boolean
+  available: boolean
+}
+
+
+const defaultMenuItems: MenuItem[] = [
   {
-    id: 1,
+    id: '1',
     name: "Couscous Royale",
     arabicName: "كسكس ملكي",
     description: "Traditional couscous with lamb, chicken, and vegetables",
@@ -41,7 +60,7 @@ const initialMenuItems: MenuItem[] = [
     available: true,
   },
   {
-    id: 2,
+    id: '2',
     name: "Tagine Djaj",
     arabicName: "طاجين دجاج",
     description: "Slow-cooked chicken tagine with olives and preserved lemons",
@@ -52,10 +71,12 @@ const initialMenuItems: MenuItem[] = [
     popular: true,
     available: true,
   },
-  // Add more items...
 ]
 
-export function MenuManagement() {
+export function MenuManagement({
+  initialMenuItems = [],
+  onMenuItemsChange
+}: MenuManagementProps) {
   const [menuItems, setMenuItems] = useState<MenuItem[]>(initialMenuItems)
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("all")
@@ -69,7 +90,7 @@ export function MenuManagement() {
     price: "",
     category: "mains",
     spicy: false,
-    vegetarian: false,
+    vegan: false,
     popular: false,
     available: true,
   })
@@ -89,31 +110,72 @@ export function MenuManagement() {
     return matchesSearch && matchesCategory
   })
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const updateMenuItems = (newItems: MenuItem[]) => {
+    setMenuItems(newItems)
+    onMenuItemsChange?.(newItems)
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    const newItem: MenuItem = {
-      id: editingItem ? editingItem.id : Date.now(),
+    // Create specials array based on the enum values
+    const specials: string[] = []
+    if (formData.spicy) specials.push("SPICY")
+    if (formData.vegan) specials.push("VEGAN") // Note: VEGAN not VEGETARIAN
+    if (formData.popular) specials.push("POPULAR")
+
+    // Prepare the data to send to API
+    const itemData = {
       name: formData.name,
-      arabicName: formData.arabicName,
-      description: formData.description,
-      price: Number.parseFloat(formData.price),
+      arabicName: formData.arabicName || null, // Allow null as per model
+      description: formData.description || null, // Allow null as per model
       category: formData.category,
-      spicy: formData.spicy,
-      vegetarian: formData.vegetarian,
-      popular: formData.popular,
+      price: Number.parseFloat(formData.price),
       available: formData.available,
+      specials // This will be used to create ItemSpecial records
     }
 
-    if (editingItem) {
-      setMenuItems((items) => items.map((item) => (item.id === editingItem.id ? newItem : item)))
-    } else {
-      setMenuItems((items) => [...items, newItem])
-    }
+    try {
+      // Determine if we're creating or updating
+      const isUpdating = editingItem !== null
+      const method = isUpdating ? 'PUT' : 'POST'
+      const url = isUpdating ? `/api/v1/menu/${editingItem.id}` : '/api/v1/menu'
 
-    resetForm()
-    setIsAddDialogOpen(false)
-    setEditingItem(null)
+      const res = await fetch(url, {
+        cache: 'no-store',
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(itemData),
+      })
+
+      if (!res.ok) {
+        throw new Error(`Failed to ${isUpdating ? 'update' : 'create'} menu item`)
+      }
+
+      const responseItem = await res.json()
+
+      if (isUpdating) {
+        // Update existing item in the list
+        const updatedItems = menuItems.map(item =>
+          item.id === editingItem.id ? responseItem : item
+        )
+        updateMenuItems(updatedItems)
+      } else {
+        // Add new item to the list
+        const updatedItems = [...menuItems, responseItem]
+        updateMenuItems(updatedItems)
+      }
+
+      resetForm()
+      setIsAddDialogOpen(false)
+      setEditingItem(null)
+
+    } catch (err) {
+      console.error(`Error ${editingItem ? 'updating' : 'creating'} menu item:`, err)
+      alert(`Failed to ${editingItem ? 'update' : 'create'} menu item`)
+    }
   }
 
   const resetForm = () => {
@@ -124,7 +186,7 @@ export function MenuManagement() {
       price: "",
       category: "mains",
       spicy: false,
-      vegetarian: false,
+      vegan: false,
       popular: false,
       available: true,
     })
@@ -132,26 +194,52 @@ export function MenuManagement() {
 
   const handleEdit = (item: MenuItem) => {
     setEditingItem(item)
-    setFormData({
+
+    // Populate form with existing item data using MenuItemPayload structure
+    const payload: MenuItemPayload = {
+      id: item.id,
       name: item.name,
       arabicName: item.arabicName,
       description: item.description,
       price: item.price.toString(),
       category: item.category,
       spicy: item.spicy,
-      vegetarian: item.vegetarian,
+      vegan: item.vegetarian,
       popular: item.popular,
       available: item.available,
-    })
+    }
+
+    setFormData(payload)
     setIsAddDialogOpen(true)
   }
 
-  const handleDelete = (id: number) => {
-    setMenuItems((items) => items.filter((item) => item.id !== id))
+  // Optional: Add a separate handler for creating new items
+  const handleAddNew = () => {
+    setEditingItem(null) // Clear editing state
+    resetForm()
+    setIsAddDialogOpen(true)
   }
 
-  const toggleAvailability = (id: number) => {
-    setMenuItems((items) => items.map((item) => (item.id === id ? { ...item, available: !item.available } : item)))
+
+
+  const toggleAvailability = async (id: string) => {
+    try {
+      const res = await fetch(`/api/v1/menu/${id}/toggle`, {
+        cache: 'no-store',
+        method: 'PUT'
+      })
+
+      if (!res.ok) {
+        throw new Error('Failed to toggle availability')
+      } else {
+        const updatedItems = menuItems.map((item) => (item.id === id ? { ...item, available: !item.available } : item))
+        updateMenuItems(updatedItems)
+      }
+    } catch (error) {
+      console.error('Error toggling availability:', error)
+      alert('Failed to toggle availability')
+    }
+
   }
 
   return (
@@ -251,7 +339,7 @@ export function MenuManagement() {
                 <div className="flex items-center space-x-2">
                   <Switch
                     id="vegetarian"
-                    checked={formData.vegetarian}
+                    checked={formData.vegan}
                     onCheckedChange={(checked) => setFormData((prev) => ({ ...prev, vegetarian: checked }))}
                   />
                   <Label htmlFor="vegetarian">Vegetarian</Label>
@@ -343,18 +431,15 @@ export function MenuManagement() {
                     </Badge>
                   </div>
 
-                  <p className="text-2xl font-bold text-primary">${item.price}</p>
+                  <p className="text-2xl font-bold text-primary">DZD{item.price}</p>
                 </div>
 
-                <div className="flex items-center gap-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
+                <div className="gap-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2">
                   <Button variant="outline" size="sm" onClick={() => toggleAvailability(item.id)}>
                     {item.available ? "Disable" : "Enable"}
                   </Button>
                   <Button variant="outline" size="sm" onClick={() => handleEdit(item)}>
                     <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={() => handleDelete(item.id)}>
-                    <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
               </div>

@@ -48,7 +48,8 @@ export async function GET() {
             }
         )
 
-    } catch {
+    } catch (error) {
+        console.error('Error computing summary:', error);
         return NextResponse.json({ error: 'Failed to compute summary' }, { status: 500 });
     }
 }

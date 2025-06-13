@@ -11,7 +11,7 @@ import { useCart } from "@/contexts/cart-context"
 import Link from "next/link"
 
 interface MenuItem {
-  id: number
+  id: string
   name: string
   arabicName: string
   description: string
@@ -22,78 +22,78 @@ interface MenuItem {
   popular?: boolean
 }
 
-const menuItems: MenuItem[] = [
-  {
-    id: 1,
-    name: "Couscous Royale",
-    arabicName: "كسكس ملكي",
-    description: "Traditional couscous with lamb, chicken, and vegetables",
-    price: 18.99,
-    category: "mains",
-    popular: true,
-  },
-  {
-    id: 2,
-    name: "Tagine Djaj",
-    arabicName: "طاجين دجاج",
-    description: "Slow-cooked chicken tagine with olives and preserved lemons",
-    price: 16.99,
-    category: "mains",
-    popular: true,
-  },
-  {
-    id: 3,
-    name: "Chorba",
-    arabicName: "شوربة",
-    description: "Traditional Algerian soup with lamb and vegetables",
-    price: 8.99,
-    category: "starters",
-  },
-  {
-    id: 4,
-    name: "Mechoui",
-    arabicName: "مشوي",
-    description: "Slow-roasted lamb shoulder with traditional spices",
-    price: 22.99,
-    category: "mains",
-    spicy: true,
-  },
-  {
-    id: 5,
-    name: "Brik",
-    arabicName: "بريك",
-    description: "Crispy pastry filled with egg, tuna, and herbs",
-    price: 7.99,
-    category: "starters",
-  },
-  {
-    id: 6,
-    name: "Makroudh",
-    arabicName: "مقروض",
-    description: "Traditional semolina pastry filled with dates",
-    price: 5.99,
-    category: "desserts",
-    vegetarian: true,
-  },
-  {
-    id: 7,
-    name: "Baklava",
-    arabicName: "بقلاوة",
-    description: "Layers of phyllo pastry with nuts and honey",
-    price: 6.99,
-    category: "desserts",
-    vegetarian: true,
-  },
-  {
-    id: 8,
-    name: "Mint Tea",
-    arabicName: "أتاي بالنعناع",
-    description: "Traditional North African mint tea",
-    price: 3.99,
-    category: "beverages",
-    vegetarian: true,
-  },
-]
+// const menuItems: MenuItem[] = [
+//   {
+//     id: 1,
+//     name: "Couscous Royale",
+//     arabicName: "كسكس ملكي",
+//     description: "Traditional couscous with lamb, chicken, and vegetables",
+//     price: 18.99,
+//     category: "mains",
+//     popular: true,
+//   },
+//   {
+//     id: 2,
+//     name: "Tagine Djaj",
+//     arabicName: "طاجين دجاج",
+//     description: "Slow-cooked chicken tagine with olives and preserved lemons",
+//     price: 16.99,
+//     category: "mains",
+//     popular: true,
+//   },
+//   {
+//     id: 3,
+//     name: "Chorba",
+//     arabicName: "شوربة",
+//     description: "Traditional Algerian soup with lamb and vegetables",
+//     price: 8.99,
+//     category: "starters",
+//   },
+//   {
+//     id: 4,
+//     name: "Mechoui",
+//     arabicName: "مشوي",
+//     description: "Slow-roasted lamb shoulder with traditional spices",
+//     price: 22.99,
+//     category: "mains",
+//     spicy: true,
+//   },
+//   {
+//     id: 5,
+//     name: "Brik",
+//     arabicName: "بريك",
+//     description: "Crispy pastry filled with egg, tuna, and herbs",
+//     price: 7.99,
+//     category: "starters",
+//   },
+//   {
+//     id: 6,
+//     name: "Makroudh",
+//     arabicName: "مقروض",
+//     description: "Traditional semolina pastry filled with dates",
+//     price: 5.99,
+//     category: "desserts",
+//     vegetarian: true,
+//   },
+//   {
+//     id: 7,
+//     name: "Baklava",
+//     arabicName: "بقلاوة",
+//     description: "Layers of phyllo pastry with nuts and honey",
+//     price: 6.99,
+//     category: "desserts",
+//     vegetarian: true,
+//   },
+//   {
+//     id: 8,
+//     name: "Mint Tea",
+//     arabicName: "أتاي بالنعناع",
+//     description: "Traditional North African mint tea",
+//     price: 3.99,
+//     category: "beverages",
+//     vegetarian: true,
+//   },
+// ]
 
 const categories = [
   { id: "all", name: "All Items", arabicName: "جميع الأطباق" },
@@ -102,15 +102,18 @@ const categories = [
   { id: "desserts", name: "Desserts", arabicName: "الحلويات" },
   { id: "beverages", name: "Beverages", arabicName: "المشروبات" },
 ]
+interface OnlineMenuProps {
+  menuItems: MenuItem[]
+}
+export function Menu({menuItems}: OnlineMenuProps) {
 
-export function Menu() {
   const [selectedCategory, setSelectedCategory] = useState("all")
   const { state, addItem, updateQuantity, openCart } = useCart()
 
   const filteredItems =
     selectedCategory === "all" ? menuItems : menuItems.filter((item) => item.category === selectedCategory)
 
-  const getItemQuantity = (itemId: number) => {
+  const getItemQuantity = (itemId: string) => {
     const cartItem = state.items.find((item) => item.id === itemId)
     return cartItem ? cartItem.quantity : 0
   }
@@ -127,12 +130,12 @@ export function Menu() {
     })
   }
 
-  const handleIncrement = (itemId: number) => {
+  const handleIncrement = (itemId: string) => {
     const currentQuantity = getItemQuantity(itemId)
     updateQuantity(itemId, currentQuantity + 1)
   }
 
-  const handleDecrement = (itemId: number) => {
+  const handleDecrement = (itemId: string) => {
     const currentQuantity = getItemQuantity(itemId)
     if (currentQuantity > 0) {
       updateQuantity(itemId, currentQuantity - 1)

@@ -13,18 +13,15 @@ import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
-import { Checkbox } from "@/components/ui/checkbox"
 import { GeometricPattern } from "@/components/arabic-patterns"
 import { ArabesqueLineDivider } from "@/components/arabesque-elements"
 import { useCart } from "@/contexts/cart-context"
 import {
   CreditCard,
   MapPin,
-  User,
   Truck,
   Store,
   Utensils,
-  Clock,
   CalendarDays,
   MessageSquare,
   ShieldCheck,
@@ -33,13 +30,12 @@ import {
 import Link from "next/link"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-
+import { OrderStatus } from "@/lib/generated/prisma"
 type OrderType = "delivery" | "pickup" | "dine-in"
 type PaymentMethod = "credit-card" | "cash" | "paypal"
 
 interface FormData {
-  firstName: string
-  lastName: string
+
   email: string
   phone: string
   orderType: OrderType
@@ -52,9 +48,8 @@ interface FormData {
   tableNumber?: string
   paymentMethod: PaymentMethod
   specialInstructions: string
-  saveInfo: boolean
-  termsAccepted: boolean
-  scheduledTime?: string
+
+
 }
 
 export function CheckoutForm() {
@@ -62,21 +57,18 @@ export function CheckoutForm() {
   const { state, getTotalItems, getTotalPrice, clearCart } = useCart()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState<FormData>({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    orderType: "delivery",
+    email: "test@garbage.local",
+    phone: "0668896460",
+    orderType: "dine-in",
     address: {
       street: "",
       city: "",
       state: "",
       zipCode: "",
     },
-    paymentMethod: "credit-card",
-    specialInstructions: "",
-    saveInfo: false,
-    termsAccepted: false,
+    paymentMethod: "cash",
+    tableNumber: undefined,
+    specialInstructions: ""
   })
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -109,45 +101,64 @@ export function CheckoutForm() {
     }))
   }
 
-  const handleCheckboxChange = (name: string, checked: boolean) => {
-    setFormData((prev) => ({
-      ...prev,
-      [name]: checked,
-    }))
-  }
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
-    if (!formData.termsAccepted) {
-      alert("Please accept the terms and conditions")
-      return
-    }
-
     setIsSubmitting(true)
 
     try {
-      // In a real app, this would be an API call to process the order
-      await new Promise((resolve) => setTimeout(resolve, 1500))
+      // Transform cart items to match API expected format
+      const orderItems = state.items.map(item => ({
+        menuItemId: item.id, // Assuming item.id is the menuItemId
+        quantity: item.quantity
+      }))
 
-      // Generate a random order number
-      const orderNumber = `ORD-${Math.floor(Math.random() * 10000)}`
+      // Prepare the order payload
+      const orderPayload = {
+        email: formData.email,
+        phone: formData.phone,
+        table_num: formData.orderType === "dine-in" && formData.tableNumber
+          ? parseInt(formData.tableNumber)
+          : null,
+        status: OrderStatus.PENDING, // Default status
+        items: orderItems
+      }
+
+      console.log('Sending order payload:', orderPayload) // For debugging
+
+      const res = await fetch("/api/v1/order", {
+        cache: "no-store",
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(orderPayload),
+      })
+
+      if (!res.ok) {
+        const errorData = await res.json()
+        throw new Error(errorData.error || 'Failed to create order')
+      }
+
+      const orderData = await res.json()
+      console.log('Order created successfully:', orderData)
+
 
       // Clear the cart
       clearCart()
 
       // Redirect to confirmation page with order number
-      router.push(`/order-confirmation?order=${orderNumber}`)
+      router.push(`/order-confirmation?order=${orderData.id}`)
     } catch (error) {
       console.error("Error processing order:", error)
-      alert("There was an error processing your order. Please try again.")
+      alert(`There was an error processing your order: ${error}. Please try again.`)
+    } finally {
       setIsSubmitting(false)
     }
   }
 
   const subtotal = getTotalPrice()
-
-  const deliveryFee = formData.orderType === "delivery" ? 3.99 : 0
   const total = subtotal
 
   // Generate available time slots
@@ -240,7 +251,7 @@ export function CheckoutForm() {
                         </Label>
                       </div>
                       <div>
-                        <RadioGroupItem value="pickup" id="pickup" className="peer sr-only" disabled/>
+                        <RadioGroupItem value="pickup" id="pickup" className="peer sr-only" disabled />
                         <Label
                           htmlFor="pickup"
                           className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-amber-600 [&:has([data-state=checked])]:border-amber-600"
@@ -346,51 +357,6 @@ export function CheckoutForm() {
                         </div>
                       </div>
                     )}
-
-                    {/* Scheduled Time (for pickup and delivery) */}
-                    {(formData.orderType === "pickup" || formData.orderType === "delivery") && (
-                      <div className="space-y-4 border-t pt-4">
-                        <h3 className="font-medium flex items-center gap-2">
-                          <Clock className="h-4 w-4 text-amber-600" />
-                          Scheduled Time
-                        </h3>
-                        <div className="grid sm:grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <Label htmlFor="scheduledTime">Preferred Time</Label>
-                            <Select
-                              value={formData.scheduledTime}
-                              onValueChange={(value) => setFormData((prev) => ({ ...prev, scheduledTime: value }))}
-                            >
-                              <SelectTrigger id="scheduledTime">
-                                <SelectValue placeholder="Select time" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="asap">As soon as possible</SelectItem>
-                                <SelectItem value="scheduled">Schedule for later</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-
-                          {formData.scheduledTime === "scheduled" && (
-                            <div className="space-y-2">
-                              <Label htmlFor="timeSlot">Select Time</Label>
-                              <Select onValueChange={(value) => console.log("Selected time:", value)}>
-                                <SelectTrigger id="timeSlot">
-                                  <SelectValue placeholder="Select time slot" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {timeSlots.map((slot) => (
-                                    <SelectItem key={slot} value={slot}>
-                                      {slot}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
                   </CardContent>
                 </Card>
 
@@ -414,7 +380,7 @@ export function CheckoutForm() {
                       className="grid sm:grid-cols-3 gap-4"
                     >
                       <div>
-                        <RadioGroupItem value="credit-card" id="credit-card" className="peer sr-only" disabled/>
+                        <RadioGroupItem value="credit-card" id="credit-card" className="peer sr-only" disabled />
                         <Label
                           htmlFor="credit-card"
                           className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-amber-600 [&:has([data-state=checked])]:border-amber-600"
@@ -446,7 +412,7 @@ export function CheckoutForm() {
                           <span className="text-sm font-medium">Cash</span>
                         </Label>
                       </div>
-                      
+
                     </RadioGroup>
 
                     {formData.paymentMethod === "credit-card" && (
@@ -495,7 +461,7 @@ export function CheckoutForm() {
                       />
                     </div>
 
-                    
+
                   </CardContent>
                 </Card>
 
@@ -558,7 +524,7 @@ export function CheckoutForm() {
                             <span className="font-medium">{item.name}</span>
                             <span className="text-muted-foreground"> × {item.quantity}</span>
                           </div>
-                          <span>${(item.price * item.quantity).toFixed(2)}</span>
+                          <span>DZD{(item.price * item.quantity).toFixed(2)}</span>
                         </div>
                       ))}
                     </div>
@@ -569,18 +535,18 @@ export function CheckoutForm() {
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
                         <span>Subtotal</span>
-                        <span>${subtotal.toFixed(2)}</span>
+                        <span>DZD{subtotal.toFixed(2)}</span>
                       </div>
 
                       <Separator />
                       <div className="flex justify-between font-semibold">
                         <span>Total</span>
-                        <span>${total.toFixed(2)}</span>
+                        <span>DZD{total.toFixed(2)}</span>
                       </div>
                     </div>
 
                     {/* Estimated Time */}
-                    
+
 
                     {/* Order Details Accordion */}
                     <Accordion type="single" collapsible className="mt-4">

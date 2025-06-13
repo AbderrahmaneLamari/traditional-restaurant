@@ -6,7 +6,6 @@ async function fetchMessages(): Promise<ClientMessage[]> {
     try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/message`, {
             cache: 'no-store',
-            next: { revalidate: 300 }
         })
 
         if (!response.ok) {

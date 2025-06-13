@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Clock, MapPin, Phone, Eye } from "lucide-react"
 
-interface Order {
+export interface Order {
   id: number
   customerName: string
   customerPhone: string
@@ -18,64 +18,20 @@ interface Order {
     price: number
   }>
   total: number
-  status: "pending" | "preparing" | "ready" | "delivered" | "cancelled"
+  status: "pending" | "preparing" | "completed" | "delivered" | "cancelled"
   type: "delivery" | "pickup"
   address?: string
   orderTime: string
   estimatedTime?: string
 }
 
-const initialOrders: Order[] = [
-  {
-    id: 1001,
-    customerName: "Sarah Johnson",
-    customerPhone: "+1 (555) 123-4567",
-    customerEmail: "sarah@example.com",
-    items: [
-      { name: "Couscous Royale", quantity: 2, price: 18.99 },
-      { name: "Mint Tea", quantity: 2, price: 3.99 },
-    ],
-    total: 45.96,
-    status: "preparing",
-    type: "delivery",
-    address: "123 Main St, City, State 12345",
-    orderTime: "2024-01-15 12:30",
-    estimatedTime: "45 min",
-  },
-  {
-    id: 1002,
-    customerName: "Ahmed Ali",
-    customerPhone: "+1 (555) 987-6543",
-    customerEmail: "ahmed@example.com",
-    items: [
-      { name: "Tagine Djaj", quantity: 1, price: 16.99 },
-      { name: "Baklava", quantity: 3, price: 6.99 },
-    ],
-    total: 37.96,
-    status: "ready",
-    type: "pickup",
-    orderTime: "2024-01-15 13:15",
-    estimatedTime: "Ready",
-  },
-  {
-    id: 1003,
-    customerName: "Maria Garcia",
-    customerPhone: "+1 (555) 456-7890",
-    customerEmail: "maria@example.com",
-    items: [
-      { name: "Chorba", quantity: 1, price: 8.99 },
-      { name: "Mechoui", quantity: 1, price: 22.99 },
-    ],
-    total: 31.98,
-    status: "pending",
-    type: "delivery",
-    address: "456 Oak Ave, City, State 12345",
-    orderTime: "2024-01-15 13:45",
-    estimatedTime: "60 min",
-  },
-]
+interface OrderManagementProps {
+  orders: Order[]
+}
 
-export function OrderManagement() {
+const baseUrl = process.env.BASE_URL || "http://localhost:3000";
+
+export function OrderManagement({ orders: initialOrders }: OrderManagementProps) {
   const [orders, setOrders] = useState<Order[]>(initialOrders)
   const [selectedStatus, setSelectedStatus] = useState("all")
   const [selectedType, setSelectedType] = useState("all")
@@ -84,7 +40,7 @@ export function OrderManagement() {
     { value: "all", label: "All Orders" },
     { value: "pending", label: "Pending" },
     { value: "preparing", label: "Preparing" },
-    { value: "ready", label: "Ready" },
+    { value: "compelted", label: "Ready" },
     { value: "delivered", label: "Delivered" },
     { value: "cancelled", label: "Cancelled" },
   ]
@@ -101,8 +57,29 @@ export function OrderManagement() {
     return matchesStatus && matchesType
   })
 
-  const updateOrderStatus = (orderId: number, newStatus: Order["status"]) => {
-    setOrders((orders) => orders.map((order) => (order.id === orderId ? { ...order, status: newStatus } : order)))
+  const updateOrderStatus = async (orderId: number, newStatus: Order["status"]) => {
+
+    try {
+      const res = await fetch(`${baseUrl}/api/v1/order/${orderId}`,
+        {
+          cache: 'no-store',
+          method: `PUT`,
+          body: JSON.stringify({ status: newStatus.toUpperCase() }),
+        }
+      )
+
+      if (!res.ok) {
+        throw new Error(`Failed to update order status: ${res.statusText}`)
+      } else {
+
+        setOrders((orders) => orders.map((order) => (order.id === orderId ? { ...order, status: newStatus } : order)));
+      }
+    }
+    catch (error) {
+      console.error("Failed to update order status:", error)
+      return
+    }
+
   }
 
   const getStatusColor = (status: string) => {
@@ -111,7 +88,7 @@ export function OrderManagement() {
         return "bg-yellow-100 text-yellow-800"
       case "preparing":
         return "bg-blue-100 text-blue-800"
-      case "ready":
+      case "completed":
         return "bg-green-100 text-green-800"
       case "delivered":
         return "bg-gray-100 text-gray-800"
@@ -127,8 +104,8 @@ export function OrderManagement() {
       case "pending":
         return "preparing"
       case "preparing":
-        return "ready"
-      case "ready":
+        return "completed"
+      case "completed":
         return "delivered"
       default:
         return currentStatus
@@ -141,7 +118,7 @@ export function OrderManagement() {
         return "Start Preparing"
       case "preparing":
         return "Mark Ready"
-      case "ready":
+      case "completed":
         return "Mark Delivered"
       default:
         return "Update"
@@ -237,7 +214,7 @@ export function OrderManagement() {
                       <h4 className="font-medium mb-2">Order Details</h4>
                       <p className="text-sm flex items-center gap-1">
                         <Clock className="h-3 w-3" />
-                        Ordered: {order.orderTime}
+                        Ordered: {new Date(order.orderTime).toLocaleString("fr-FR", {})}
                       </p>
                       {order.estimatedTime && (
                         <p className="text-sm text-muted-foreground">Estimated: {order.estimatedTime}</p>
@@ -253,24 +230,20 @@ export function OrderManagement() {
                           <span>
                             {item.quantity}x {item.name}
                           </span>
-                          <span>${(item.price * item.quantity).toFixed(2)}</span>
+                          <span>DZD{(item.price * item.quantity).toFixed(2)}</span>
                         </div>
                       ))}
                     </div>
                     <div className="border-t pt-2 mt-2">
                       <div className="flex justify-between font-semibold">
                         <span>Total:</span>
-                        <span>${order.total.toFixed(2)}</span>
+                        <span>DZD{order.total.toFixed(2)}</span>
                       </div>
                     </div>
                   </div>
                 </div>
 
                 <div className="flex flex-col gap-2 lg:w-48">
-                  <Button variant="outline" size="sm" className="w-full">
-                    <Eye className="h-4 w-4 mr-2" />
-                    View Details
-                  </Button>
 
                   {order.status !== "delivered" && order.status !== "cancelled" && (
                     <Button

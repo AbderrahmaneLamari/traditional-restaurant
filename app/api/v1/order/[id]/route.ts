@@ -1,16 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { validateOrderPayload } from '@/lib/validators'
+import { OrderStatus } from '@/lib/generated/prisma';
 
 export async function GET(_: NextRequest, { params }: { params: { id: string } }) {
     try {
         const order = await prisma.order.findUnique({
             where: { id: params.id },
-            include: { items: true }
-        })
+            include: { OrderItem: true }
+        });
 
-        if (!order) return NextResponse.json({ error: 'Order not found' }, { status: 404 })
-        return NextResponse.json(order)
+        const orderItems = await prisma.orderItem.findMany({
+            where: { orderId: params.id },
+            include: { menuItem: true }
+        });
+
+        const totalSum = orderItems.reduce((sum, item) => sum + item.quantity * item.menuItem.price, 0);
+        const menuItems = orderItems.map(item => { return { name: item.menuItem.name, price: item.menuItem.price, quantity: item.quantity } }) // Assuming you want to return menu items in some format
+
+        if (!order) return NextResponse.json({ error: 'Order not found' }, { status: 404 });
+
+        return NextResponse.json({ order, totalSum, menuItems })
     } catch {
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
     }
@@ -19,28 +29,25 @@ export async function GET(_: NextRequest, { params }: { params: { id: string } }
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
     try {
         const body = await req.json()
-        const { valid, message } = validateOrderPayload(body)
-        if (!valid) return NextResponse.json({ error: message }, { status: 400 })
 
-        const { email, table_num, status, items } = body
+        const { status } = body
+
+        if (!status || !Object.values(OrderStatus).includes(status)) {
+            return NextResponse.json({ error: 'Invalid status' }, { status: 400 })
+        }
 
         const updatedOrder = await prisma.order.update({
             where: { id: params.id },
             data: {
-                email,
-                table_num,
                 status,
-                items: {
-                    set: [], // clear current items
-                    connect: items.map((id: string) => ({ id }))
-                }
             },
-            include: { items: true }
+            include: { OrderItem: true }
         })
 
         return NextResponse.json(updatedOrder)
-    } catch {
-        return NextResponse.json({ error: 'Could not update order' }, { status: 500 })
+    } catch (err) {
+        console.log(err)
+        return NextResponse.json({ error: 'Could not update order', obj: err }, { status: 500 })
     }
 }
 
