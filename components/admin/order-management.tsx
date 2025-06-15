@@ -29,7 +29,7 @@ interface OrderManagementProps {
   orders: Order[]
 }
 
-const baseUrl = process.env.BASE_URL || `http://localhost:3000${process.env.PORT}`
+const baseUrl = process.env.BASE_URL || `http://localhost:${process.env.PORT}`
 
 export function OrderManagement({ orders: initialOrders }: OrderManagementProps) {
   const [orders, setOrders] = useState<Order[]>(initialOrders)
