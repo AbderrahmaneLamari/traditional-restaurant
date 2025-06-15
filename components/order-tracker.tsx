@@ -82,7 +82,7 @@ interface menuItems {
   price: number
   quantity: number
 }
-const baseUrl = process.env.BASE_URL || `http://localhost:3000${process.env.PORT}` || "http://localhost:3000";
+const baseUrl = process.env.BASE_URL || `http://localhost:3000${process.env.PORT}`
 export function OrderTracker({ orderProp, totalSum, menuItems }: { orderProp: Order, totalSum: number, menuItems: menuItems[] }) {
 
   const getStatusStep = (status: string) => {
