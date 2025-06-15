@@ -15,6 +15,7 @@ export default async function OrderStatusPage({ searchParams }: { searchParams: 
     }
 
     const res = await fetch(`${baseUrl}/api/v1/order/${order}`, { cache: 'no-store' });
+    
     if (!res.ok) {
       throw new Error('Failed to fetch order details');
     }
