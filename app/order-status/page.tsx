@@ -3,7 +3,7 @@ import { Footer } from "@/components/footer"
 import { OrderTracker } from "@/components/order-tracker"
 export const dynamic = 'force-dynamic'
 
-const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
+const baseUrl = process.env.BASE_URL || `http://localhost:3000${process.env.PORT}` || "http://localhost:3000";
 
 export default async function OrderStatusPage({ searchParams }: { searchParams: { order?: string } }) {
 

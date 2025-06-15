@@ -1,5 +1,5 @@
 import { AdminDashboard } from "./AdminDashboard"
-const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
+const baseUrl = process.env.BASE_URL || `http://localhost:3000${process.env.PORT}` || "http://localhost:3000";
 
 interface SummaryData {
     revenueThisMonth: number
