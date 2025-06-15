@@ -14,7 +14,7 @@ export default async function OrderStatusPage({ searchParams }: { searchParams: 
       throw new Error('Order ID is required');
     }
 
-    const res = await fetch(`/api/v1/order/${order}`, { cache: 'no-store' });
+    const res = await fetch(`${baseUrl}/api/v1/order/${order}`, { cache: 'no-store' });
     if (!res.ok) {
       throw new Error('Failed to fetch order details');
     }
