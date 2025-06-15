@@ -4,6 +4,7 @@ import { OrderTracker } from "@/components/order-tracker"
 export const dynamic = 'force-dynamic'
 
 const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
+
 export default async function OrderStatusPage({ searchParams }: { searchParams: { order?: string } }) {
 
   try {
@@ -13,10 +14,11 @@ export default async function OrderStatusPage({ searchParams }: { searchParams: 
       throw new Error('Order ID is required');
     }
 
-    const res = await fetch(`${baseUrl}/api/v1/order/${order}`, { cache: 'no-store' });
+    const res = await fetch(`/api/v1/order/${order}`, { cache: 'no-store' });
     if (!res.ok) {
       throw new Error('Failed to fetch order details');
     }
+
     const orderData = await res.json();
     if (!orderData.order) {
       throw new Error('Order not found');
