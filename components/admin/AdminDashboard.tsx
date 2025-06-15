@@ -82,7 +82,7 @@ export function AdminDashboard({ initialSummary, menuItems, orderItems, analytic
 
                     {/* Analytics Tab */}
                     <TabsContent value="analytics">
-                        <Analytics topMenuItems={analytics.topMenuItems} overviewData={analytics.overviewData} revenueTrend={analytics.revenueTrend} />
+                        {/* <Analytics topMenuItems={analytics.topMenuItems} overviewData={analytics.overviewData} revenueTrend={analytics.revenueTrend} /> */}
                     </TabsContent>
                 </Tabs>
             </div>
