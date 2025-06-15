@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { validateOrderPayload } from '@/lib/validators'
 import { OrderStatus } from '@/lib/generated/prisma';
+export const dynamic = 'force-dynamic'
 
 export async function GET(_: NextRequest, { params }: { params: { id: string } }) {
     try {

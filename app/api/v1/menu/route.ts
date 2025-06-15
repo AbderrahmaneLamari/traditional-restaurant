@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { MenuItemSpecials } from '@/lib/generated/prisma'
+export const dynamic = 'force-dynamic'
 
 // GET all items
 export async function GET() {

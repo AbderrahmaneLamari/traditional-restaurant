@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+export const dynamic = 'force-dynamic'
 
 export async function PUT(_: NextRequest, { params }: { params: { id: string } }) {
     const item = await prisma.menuItem.findUnique({ where: { id: params.id } })

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { subMonths, format } from 'date-fns'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(_: NextRequest) {
     try {
         const today = new Date()
