@@ -4,6 +4,7 @@ import { Footer } from "@/components/footer"
 import { prisma } from "@/lib/prisma"
 import { MenuItem } from "@/components/admin/menu-management" // this is your interface
 
+export const dynamic = "force-dynamic"; // Force dynamic rendering for this page
 export default async function MenuPage() {
   try {
     // Fetch all menu items including specials from the database
