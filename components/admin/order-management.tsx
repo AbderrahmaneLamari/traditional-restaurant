@@ -57,7 +57,7 @@ export function OrderManagement({ orders: initialOrders }: OrderManagementProps)
     return matchesStatus && matchesType
   })
 
-  const updateOrderStatus = async (orderId: number, newStatus: Order["status"]) => {
+   const updateOrderStatus = async (orderId: number, newStatus: Order["status"]) => {
 
     try {
       const res = await fetch(`${baseUrl}/api/v1/order/${orderId}`,
@@ -120,6 +120,7 @@ export function OrderManagement({ orders: initialOrders }: OrderManagementProps)
         return "Mark Ready"
       case "completed":
         return "Mark Delivered"
+      
       default:
         return "Update"
     }
@@ -182,14 +183,14 @@ export function OrderManagement({ orders: initialOrders }: OrderManagementProps)
       </Card>
 
       {/* Orders */}
-      <div className="space-y-4">
+      <div className="space-4 gap-2 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2">
         {filteredOrders.map((order) => (
           <Card key={order.id}>
             <CardContent className="p-6">
               <div className="flex flex-col lg:flex-row justify-between gap-4">
                 <div className="flex-1">
-                  <div className="flex items-center gap-4 mb-4">
-                    <h3 className="text-lg font-semibold">Order #{order.id}</h3>
+                  <h3 className=" text-sm md:text-md xl:text-lg font-semibold">Order No. {order.id}</h3>
+                  <div className="flex items-center gap-4 mb-4 mt-2">
                     <Badge className={getStatusColor(order.status)}>{order.status}</Badge>
                     <Badge variant="outline">{order.type}</Badge>
                   </div>

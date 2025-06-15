@@ -1,5 +1,6 @@
 import { startOfMonth, endOfMonth, subMonths } from 'date-fns'
 import { prisma } from '@/lib/prisma'
+import { OrderStatus } from './generated/prisma'
 
 function calculateGrowth(current: number, previous: number): number {
     if (previous === 0) return current === 0 ? 0 : 100
@@ -15,14 +16,23 @@ export async function getCompositeMonthlyGrowth() {
 
     const [currentOrders, previousOrders, currentCount] = await Promise.all([
         prisma.order.findMany({
-            where: { createdAt: { gte: startCurrent, lte: endCurrent } },
+            where: {
+                createdAt: { gte: startCurrent, lte: endCurrent },
+                status: { in: [OrderStatus.COMPLETED, OrderStatus.DELIVERED] } // Only consider completed or delivered orders
+            },
             include: { OrderItem: { include: { menuItem: true } } },
         }),
         prisma.order.findMany({
-            where: { createdAt: { gte: startPrevious, lte: endPrevious } },
+            where: {
+                createdAt: { gte: startPrevious, lte: endPrevious },
+                status: { in: [OrderStatus.COMPLETED, OrderStatus.DELIVERED] }
+            },
+
             include: { OrderItem: { include: { menuItem: true } } },
         }),
-        prisma.order.count()
+        prisma.order.count({
+            where: { status: { in: [OrderStatus.COMPLETED, OrderStatus.DELIVERED] } }
+        })
     ])
 
     // Revenue calculation using quantity * menuItem.price

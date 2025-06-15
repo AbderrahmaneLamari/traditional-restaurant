@@ -22,7 +22,7 @@ export interface MenuItem {
   price: number
   category: string
   spicy: boolean
-  vegetarian: boolean
+  vegan: boolean
   popular: boolean
   available: boolean
 }
@@ -55,7 +55,7 @@ const defaultMenuItems: MenuItem[] = [
     price: 18.99,
     category: "mains",
     spicy: false,
-    vegetarian: false,
+    vegan: false,
     popular: true,
     available: true,
   },
@@ -67,7 +67,7 @@ const defaultMenuItems: MenuItem[] = [
     price: 16.99,
     category: "mains",
     spicy: false,
-    vegetarian: false,
+    vegan: false,
     popular: true,
     available: true,
   },
@@ -204,7 +204,7 @@ export function MenuManagement({
       price: item.price.toString(),
       category: item.category,
       spicy: item.spicy,
-      vegan: item.vegetarian,
+      vegan: item.vegan,
       popular: item.popular,
       available: item.available,
     }
@@ -298,7 +298,7 @@ export function MenuManagement({
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="price">Price ($)</Label>
+                  <Label htmlFor="price">Price (dzd)</Label>
                   <Input
                     id="price"
                     type="number"
@@ -338,11 +338,11 @@ export function MenuManagement({
                 </div>
                 <div className="flex items-center space-x-2">
                   <Switch
-                    id="vegetarian"
+                    id="vegan"
                     checked={formData.vegan}
-                    onCheckedChange={(checked) => setFormData((prev) => ({ ...prev, vegetarian: checked }))}
+                    onCheckedChange={(checked) => setFormData((prev) => ({ ...prev, vegan: checked }))}
                   />
-                  <Label htmlFor="vegetarian">Vegetarian</Label>
+                  <Label htmlFor="vegan">Vegan</Label>
                 </div>
               </div>
 
@@ -408,7 +408,7 @@ export function MenuManagement({
       </Card>
 
       {/* Menu Items */}
-      <div className="grid gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {filteredItems.map((item) => (
           <Card key={item.id} className={`${!item.available ? "opacity-60" : ""}`}>
             <CardContent className="p-4">
@@ -424,7 +424,7 @@ export function MenuManagement({
                   <div className="flex flex-wrap gap-2 mb-3">
                     <Badge variant="outline">{item.category}</Badge>
                     {item.spicy && <Badge variant="destructive">Spicy</Badge>}
-                    {item.vegetarian && <Badge variant="outline">Vegetarian</Badge>}
+                    {item.vegan && <Badge variant="outline">Vegan</Badge>}
                     {item.popular && <Badge variant="secondary">Popular</Badge>}
                     <Badge variant={item.available ? "default" : "secondary"}>
                       {item.available ? "Available" : "Unavailable"}

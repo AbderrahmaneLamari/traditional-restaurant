@@ -214,7 +214,7 @@ export function Menu({menuItems}: OnlineMenuProps) {
                       <p className="text-sm text-amber-600 font-medium arabic-text">{item.arabicName}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-xl font-bold text-primary">${item.price}</p>
+                      <p className="text-xl font-bold text-primary">DZD{item.price}</p>
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-1 mt-2">

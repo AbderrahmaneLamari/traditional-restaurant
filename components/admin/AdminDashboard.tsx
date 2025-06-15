@@ -4,7 +4,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { GeometricPattern } from "@/components/arabic-patterns"
-import { useState } from "react"
+import { use, useEffect, useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import {
@@ -114,7 +114,7 @@ export function DashboardHeader({ onOpenSettings }: DashboardHeaderProps) {
                                 Back to Site
                             </Button>
                         </Link>
-                        <h1 className="text-2xl font-bold text-primary text-sm lg:text-lg xl:text-xl">
+                        <h1 className="text-2xl font-bold text-primary lg:text-lg xl:text-xl">
                             <span className="text-amber-600">Admin</span> Dashboard
                         </h1>
                     </div>
@@ -134,7 +134,7 @@ export function DashboardHeader({ onOpenSettings }: DashboardHeaderProps) {
 
 export function DashboardTabs() {
     return (
-        <TabsList className="grid w-full grid-cols-4 grid-rows-2 gap-2 h-12 sm:h-12 md:h-15 sm:grid-cols-5 sm:grid-rows-1 sm:gap-2">
+        <TabsList className="grid w-full grid-cols-4 grid-rows-1 gap-2 h-12 sm:h-12 md:h-15 sm:gap-2">
             <TabsTrigger value="overview" className="flex items-center gap-2 max-sm:text-xs max-md:text-sm max-lg:text-md">
                 <LayoutDashboard className="max-sm:h-2 max-sm:w-2 max-md:h-3 max-md:w-3 max-lg:h-4 max-lg:w-4" />
                 Overview
@@ -203,10 +203,30 @@ interface StatsCardsProps {
 }
 
 export function StatsCards({ summary }: StatsCardsProps) {
+    
+    const [refreshData, setRefreshData] = useState(summary);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await fetch('/api/v1/analytics/summary', { cache: 'no-store' });
+                if (!response.ok) {
+                    throw new Error('Failed to fetch summary data');
+                }
+                const data = await response.json();
+                setRefreshData(data);
+            } catch (error) {
+                console.error('Error fetching summary data:', error);
+            }
+        };
+
+        fetchData();
+    }, []);
+
     const stats = [
         {
             title: "Total Revenue",
-            value: `DZD ${summary.revenueThisMonth}`,
+            value: `DZD ${refreshData.revenueThisMonth}`,
             change: summary.revenueRatio,
             changeText: "from last month",
             icon: DollarSign,
@@ -214,7 +234,7 @@ export function StatsCards({ summary }: StatsCardsProps) {
         },
         {
             title: "Orders Today",
-            value: summary.ordersToday.toString(),
+            value: refreshData.ordersToday.toString(),
             change: summary.ordersRatio,
             changeText: "from last month",
             icon: ShoppingCart,
@@ -222,7 +242,7 @@ export function StatsCards({ summary }: StatsCardsProps) {
         },
         {
             title: "Menu Items",
-            value: summary.numberMenuItems.toString(),
+            value: refreshData.numberMenuItems.toString(),
             change: null,
             changeText: null,
             icon: Package,
@@ -230,7 +250,7 @@ export function StatsCards({ summary }: StatsCardsProps) {
         },
         {
             title: "Growth",
-            value: summary.growth.toString(),
+            value: refreshData.growth.toString(),
             change: null,
             changeText: "from last month",
             icon: TrendingUp,

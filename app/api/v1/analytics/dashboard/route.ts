@@ -7,6 +7,11 @@ export async function GET() {
 
         const [orders, orderCount] = await Promise.all([
             prisma.order.findMany({
+                where: {
+                    status: {
+                        in: ['COMPLETED', 'DELIVERED'], // Only consider completed or delivered orders
+                    },
+                },
                 include: {
                     OrderItem: {
                         include: {
@@ -15,7 +20,13 @@ export async function GET() {
                     },
                 },
             }),
-            prisma.order.count(),
+            prisma.order.count({
+                where: {
+                    status: {
+                        in: ['COMPLETED', 'DELIVERED'], // Only consider completed or delivered orders
+                    },
+                },
+            }),
         ]);
 
         const totalRevenue = orders.reduce((sum, order) => {

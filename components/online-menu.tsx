@@ -211,7 +211,7 @@ export function OnlineMenu({ menuItems }: { menuItems: MenuItem[] }) {
                       {state.items.reduce((total, item) => total + item.quantity, 0)} items
                     </p>
                     <p className="text-sm">
-                      ${state.items.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2)}
+                      DZD{state.items.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2)}
                     </p>
                   </div>
                   <Button size="sm" variant="secondary">
@@ -244,7 +244,7 @@ export function OnlineMenu({ menuItems }: { menuItems: MenuItem[] }) {
                       <p className="text-sm text-amber-600 font-medium arabic-text">{item.arabicName}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-xl font-bold text-primary">${item.price}</p>
+                      <p className="text-xl font-bold text-primary">DZD{item.price}</p>
                     </div>
                   </div>
 

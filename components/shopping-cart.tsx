@@ -99,8 +99,8 @@ export function ShoppingCartSidebar() {
                   </Button>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-semibold">${(item.price * item.quantity).toFixed(2)}</p>
-                  <p className="text-xs text-muted-foreground">${item.price.toFixed(2)} each</p>
+                  <p className="text-sm font-semibold">DZD{(item.price * item.quantity).toFixed(2)}</p>
+                  <p className="text-xs text-muted-foreground">DZD{item.price.toFixed(2)} each</p>
                 </div>
               </div>
             </CardContent>
@@ -118,12 +118,12 @@ export function ShoppingCartSidebar() {
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
             <span>Subtotal</span>
-            <span>${getTotalPrice().toFixed(2)}</span>
+            <span>DZD{getTotalPrice().toFixed(2)}</span>
           </div>
           <Separator />
           <div className="flex justify-between font-semibold">
             <span>Total</span>
-            <span>${(getTotalPrice()).toFixed(2)}</span>
+            <span>DZD{(getTotalPrice()).toFixed(2)}</span>
           </div>
         </div>
 

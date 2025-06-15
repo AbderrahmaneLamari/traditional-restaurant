@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { validateOrderPayload } from '@/lib/validators'
+import { OrderStatus } from '@/lib/generated/prisma'
 
 export async function GET() {
     try {
         const orders = await prisma.order.findMany({
+            where: {
+                status: {
+                    in: [OrderStatus.PENDING,  OrderStatus.PREPARING, OrderStatus.COMPLETED], // Adjust based on your enum values
+                },
+            },
             include: {
                 OrderItem: {
                     include: {

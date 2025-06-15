@@ -4,11 +4,11 @@ import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Search, CheckCircle2, Clock, ChefHat, Truck, MapPin, Phone } from "lucide-react"
+import { Search, CheckCircle2, Clock, ChefHat, Truck, MapPin, Phone, Delete, Cross, Trash, Trash2 } from "lucide-react"
 import { GeometricPattern } from "@/components/arabic-patterns"
 import { ArabesqueLineDivider } from "@/components/arabesque-elements"
 import Link from "next/link"
-import { Order } from "@/lib/generated/prisma"
+import { Order, OrderStatus as nigga } from "@/lib/generated/prisma"
 
 
 
@@ -22,7 +22,7 @@ interface OrderStatus {
     price: number
   }>
   total: number
-  status: "pending" | "preparing" | "ready" | "out-for-delivery" | "delivered"
+  status: nigga
   type: "delivery" | "pickup"
   address?: string
   orderTime: string
@@ -40,7 +40,7 @@ const mockOrders: Record<string, OrderStatus> = {
       { name: "Mint Tea", quantity: 2, price: 3.99 },
     ],
     total: 45.96,
-    status: "preparing",
+    status: nigga.PREPARING,
     type: "delivery",
     address: "123 Main St, City, State 12345",
     orderTime: "2024-01-15 12:30",
@@ -55,7 +55,7 @@ const mockOrders: Record<string, OrderStatus> = {
       { name: "Baklava", quantity: 3, price: 6.99 },
     ],
     total: 37.96,
-    status: "ready",
+    status: nigga.COMPLETED,
     type: "pickup",
     orderTime: "2024-01-15 13:15",
     estimatedDeliveryTime: "2024-01-15 13:45",
@@ -69,7 +69,7 @@ const mockOrders: Record<string, OrderStatus> = {
       { name: "Mechoui", quantity: 1, price: 22.99 },
     ],
     total: 31.98,
-    status: "out-for-delivery",
+    status: nigga.PREPARING,
     type: "delivery",
     address: "456 Oak Ave, City, State 12345",
     orderTime: "2024-01-15 13:45",
@@ -82,23 +82,21 @@ interface menuItems {
   price: number
   quantity: number
 }
-
+const baseUrl = process.env.BASE_URL || "http://localhost:3000"
 export function OrderTracker({ orderProp, totalSum, menuItems }: { orderProp: Order, totalSum: number, menuItems: menuItems[] }) {
-
-  const [order, setOrder] = useState<OrderStatus | null>(null)
 
   const getStatusStep = (status: string) => {
     switch (status) {
-      case "PENDING":
+      case nigga.PENDING:
         return 1
-      case "PREPARING":
+      case nigga.PREPARING:
         return 2
-      case "READY":
+      case nigga.COMPLETED:
         return 3
-      case "OUT-FOR-DELIVERY":
+      case nigga.DELIVERED:
         return 4
-      case "DELIVERED":
-        return 5
+      case nigga.CANCELLED:
+        return 1
       default:
         return 1
     }
@@ -106,16 +104,16 @@ export function OrderTracker({ orderProp, totalSum, menuItems }: { orderProp: Or
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "PENDING":
+      case nigga.PENDING:
         return "bg-yellow-100 text-yellow-800"
-      case "PREPARING":
+      case nigga.PREPARING:
         return "bg-blue-100 text-blue-800"
-      case "READY":
+      case nigga.COMPLETED:
         return "bg-green-100 text-green-800"
-      case "OUT-FOR-DELIVERY":
-        return "bg-purple-100 text-purple-800"
-      case "DELIVERED":
+      case nigga.DELIVERED:
         return "bg-gray-100 text-gray-800"
+      case nigga.CANCELLED:
+        return "bg-red-100 text-red-800"
       default:
         return "bg-gray-100 text-gray-800"
     }
@@ -123,34 +121,53 @@ export function OrderTracker({ orderProp, totalSum, menuItems }: { orderProp: Or
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case "PENDING":
+      case nigga.PENDING:
         return "Order Received"
-      case "PREPARING":
+      case nigga.PREPARING:
         return "Preparing Your Order"
-      case "READY":
-        return "Ready for Pickup/Delivery"
-      case "OUT-FOR-DELIVERY":
-        return "Out for Delivery"
-      case "DELIVERED":
+      case nigga.COMPLETED:
+        return "Ready for Pickup"
+      case nigga.DELIVERED:
         return "Delivered"
+      case nigga.CANCELLED:
+        return "Cancelled"
       default:
         return "Unknown Status"
     }
   }
+   const updateOrderStatus = async (orderId: string, newStatus: Order["status"]) => {
 
+    try {
+      const res = await fetch(`${baseUrl}/api/v1/order/${orderId}`,
+        {
+          cache: 'no-store',
+          method: `PUT`,
+          body: JSON.stringify({ status: newStatus.toUpperCase() }),
+        }
+      )
+
+      if (!res.ok) {
+        throw new Error(`Failed to update order status: ${res.statusText}`)
+      } 
+    }
+    catch (error) {
+      console.error("Failed to update order status:", error)
+      return
+    }
+
+   }
+  
   const getStatusIcon = (status: string, active: boolean) => {
     const className = `h-6 w-6 ${active ? "text-amber-600" : "text-gray-400"}`
 
     switch (status) {
-      case "pending":
+      case nigga.PENDING:
         return <Clock className={className} />
-      case "preparing":
+      case nigga.PREPARING:
         return <ChefHat className={className} />
-      case "ready":
+      case nigga.COMPLETED:
         return <CheckCircle2 className={className} />
-      case "out-for-delivery":
-        return <Truck className={className} />
-      case "delivered":
+      case nigga.DELIVERED:
         return <CheckCircle2 className={className} />
       default:
         return <Clock className={className} />
@@ -209,12 +226,12 @@ export function OrderTracker({ orderProp, totalSum, menuItems }: { orderProp: Or
                   <div className="absolute top-1/2 left-0 right-0 h-1 bg-gray-200 transform -translate-y-1/2"></div>
                   <div
                     className="absolute top-1/2 left-0 h-1 bg-amber-600 transform -translate-y-1/2"
-                    style={{ width: `${(getStatusStep(orderProp.status) / 5) * 100}%` }}
+                    style={{ width: `${(getStatusStep(orderProp.status) / 3) * 100}%` }}
                   ></div>
 
                   {/* Status steps */}
                   <div className="relative flex justify-between">
-                    {["PENDING", "PREPARING", "READY", "OUT-FOR-DELIVERY", "DELIVERED"].map((status, index) => {
+                    {[nigga.PENDING, nigga.PREPARING, nigga.COMPLETED].map((status, index) => {
                       const isActive = getStatusStep(orderProp.status) >= index + 1
                       return (
                         <div key={status} className="flex flex-col items-center">
@@ -248,6 +265,15 @@ export function OrderTracker({ orderProp, totalSum, menuItems }: { orderProp: Or
                   </p>
                 </div>
 
+                <div>
+                  
+                  
+                  <Button className="flex items-center rounded-lg gap-1 bg-red-600 text-white"
+                    onClick={() => updateOrderStatus(orderProp.id, nigga.CANCELLED)}
+                  >
+                    <Trash2 className="h-4 w-4" /> Cancel Order
+                  </Button>
+                </div>
                 {/* {orderProp.type === "delivery" && order.address && (
                   <div>
                     <h3 className="font-semibold mb-2">Delivery Address</h3>

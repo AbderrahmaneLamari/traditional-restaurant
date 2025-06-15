@@ -14,14 +14,14 @@ export function NavigationCards() {
       href: "/menu",
       color: "bg-amber-600 hover:bg-amber-700",
     },
-    {
-      title: "Track Order",
-      arabicTitle: "تتبع الطلب",
-      description: "Check the status of your current order",
-      icon: Clock,
-      href: "/order-status",
-      color: "bg-blue-600 hover:bg-blue-700",
-    },
+    // {
+    //   title: "Track Order",
+    //   arabicTitle: "تتبع الطلب",
+    //   description: "Check the status of your current order",
+    //   icon: Clock,
+    //   href: "/order-status",
+    //   color: "bg-blue-600 hover:bg-blue-700",
+    // },
     {
       title: "Admin Dashboard",
       arabicTitle: "لوحة الإدارة",
@@ -45,7 +45,7 @@ export function NavigationCards() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
           {cards.map((card, index) => (
             <Card key={index} className="relative overflow-hidden hover:shadow-lg transition-all duration-300 group">
               {/* Background pattern */}

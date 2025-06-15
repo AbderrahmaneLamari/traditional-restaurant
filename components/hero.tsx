@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react"
 import Image from "next/image"
 import { GeometricPattern, IslamicGeometricOverlay, ArabicCalligraphyBorder } from "@/components/arabic-patterns"
 import { ArabesqueLineDivider } from "@/components/arabesque-elements"
+import Link from "next/link"
 
 export function Hero() {
   return (
@@ -66,17 +67,21 @@ export function Hero() {
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <Button size="lg" className="bg-amber-600 hover:bg-amber-700 text-white px-8 py-3 text-lg">
-            View Our Menu
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </Button>
-          <Button
-            size="lg"
-            variant="outline"
-            className="border-white text-primary hover:bg-white hover:text-black px-8 py-3 text-lg"
-          >
-            Order Online
-          </Button>
+          <Link href="/menu">
+            <Button size="lg" className="bg-amber-600 hover:bg-amber-700 text-white px-8 py-3 text-lg">
+              View Our Menu
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+          </Link>
+          <Link href="/menu ">
+            <Button
+              size="lg"
+              variant="outline"
+              className="border-white text-primary hover:bg-white hover:text-black px-8 py-3 text-lg"
+            >
+              Order Online
+            </Button>
+          </Link>
         </div>
       </div>
 
