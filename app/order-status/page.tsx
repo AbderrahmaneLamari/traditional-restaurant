@@ -39,7 +39,7 @@ export default async function OrderStatusPage({ searchParams }: { searchParams: 
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Order Not Found</h1>
+          <h1 className="text-2xl font-bold mb-4">{error.message}</h1>
           <p className="text-lg">The order you are looking for does not exist or has been deleted.</p>
         </div>
       </div>
