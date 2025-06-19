@@ -82,7 +82,7 @@ interface menuItems {
   price: number
   quantity: number
 }
-const baseUrl = process.env.BASE_URL || `http://localhost:${process.env.PORT}`
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || `http://localhost:${process.env.PORT}`
 export function OrderTracker({ orderProp, totalSum, menuItems }: { orderProp: Order, totalSum: number, menuItems: menuItems[] }) {
 
   const getStatusStep = (status: string) => {
@@ -138,7 +138,7 @@ export function OrderTracker({ orderProp, totalSum, menuItems }: { orderProp: Or
    const updateOrderStatus = async (orderId: string, newStatus: Order["status"]) => {
 
     try {
-      const res = await fetch(`${baseUrl}/api/v1/order/${orderId}`,
+      const res = await fetch(`/api/v1/order/${orderId}`,
         {
           cache: 'no-store',
           method: `PUT`,

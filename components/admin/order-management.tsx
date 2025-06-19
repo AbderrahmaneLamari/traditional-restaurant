@@ -29,7 +29,7 @@ interface OrderManagementProps {
   orders: Order[]
 }
 
-const baseUrl = process.env.BASE_URL || `http://localhost:${process.env.PORT}`
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || `http://localhost:${process.env.PORT}`
 
 export function OrderManagement({ orders: initialOrders }: OrderManagementProps) {
   const [orders, setOrders] = useState<Order[]>(initialOrders)
@@ -60,7 +60,7 @@ export function OrderManagement({ orders: initialOrders }: OrderManagementProps)
    const updateOrderStatus = async (orderId: number, newStatus: Order["status"]) => {
 
     try {
-      const res = await fetch(`${baseUrl}/api/v1/order/${orderId}`,
+      const res = await fetch(`/api/v1/order/${orderId}`,
         {
           cache: 'no-store',
           method: `PUT`,
