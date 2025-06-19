@@ -210,7 +210,7 @@ export function OrderTracker({ orderProp, totalSum, menuItems }: { orderProp: Or
             <CardHeader className="relative z-10">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                  <CardTitle className="text-2xl">Order #{orderProp.id}</CardTitle>
+                  <CardTitle className="text-sm md:text-xl lg:text-2xl">Order #{orderProp.id}</CardTitle>
                   {/* <p className="text-muted-foreground">Placed on {orderProp.createdAt.toISOString()}</p> */}
                 </div>
                 <Badge className={getStatusColor(orderProp.status)}>{getStatusText(orderProp.status)}</Badge>
